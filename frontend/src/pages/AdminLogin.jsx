@@ -51,7 +51,7 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: `rgba(21, 49, 32, 255)` }}>
       <form
         className="w-full max-w-sm bg-white p-6 rounded-lg shadow-md"
         onSubmit={handleSubmit}

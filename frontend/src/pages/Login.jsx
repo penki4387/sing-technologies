@@ -43,9 +43,9 @@ const Login = () => {
       const twoHoursInMs = 2 * 60 * 60 * 1000; // Two hours in milliseconds
 
       setWithExpiry('usertoken', response.data.token, twoHoursInMs);
-      setWithExpiry('username', response.data.user, twoHoursInMs);
-      setWithExpiry('fundingWallet', response.data.fundingWallet, twoHoursInMs);
-      setWithExpiry('supportWallet', response.data.supportWallet, twoHoursInMs);
+      localStorage.setItem('username', response.data.user);
+      localStorage.setItem('fundingWallet', response.data.fundingWallet);
+      localStorage.setItem('supportWallet', response.data.supportWallet);
       alert('Login successful!');
       navigate('/');
     } catch (error) {
@@ -55,9 +55,9 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center " style={{backgroundColor:"rgba(21,49,32,255)"}}>
       <form
-        className="w-full max-w-sm mt-10 bg-white p-6 rounded-lg shadow-md"
+        className="w-full max-w-sm  bg-white p-6 rounded-lg shadow-md"
         onSubmit={handleSubmit}
       >
         <h2 className="text-2xl font-semibold text-center mb-6">User Login</h2>

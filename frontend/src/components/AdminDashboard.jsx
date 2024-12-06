@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
   const [activeComponent, setActiveComponent] = useState('dashboard');
+  const [hoverSidebarElement, setHoverSidebarElement] = useState(null);
     const navigate = useNavigate
   const renderComponent = () => {
     switch (activeComponent) {
@@ -24,14 +25,25 @@ const AdminDashboard = () => {
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      <aside className="w-64  text-white flex flex-col" style={{backgroundColor: "rgba(21,49,32,255)"}}>
-    <h2 className="text-xl font-bold py-4 px-6 bg-black">Admin Dashboard</h2>
+      <aside className="w-64  text-white flex flex-col" style={{ backgroundColor: `rgba(41, 69, 52, 255)` }}>
+      <h2 className="text-xl font-bold py-4 px-6 my-2 mx-4" style={{ backgroundColor: `rgba(51, 79, 62, 255)` }}>User Dashboard </h2>
     <nav className="flex-1">
-      <ul>
+      <ul
+      className="flex flex-col rounded-lg shadow-md p-2 mx-4 my-0"
+      style={{ backgroundColor: `rgba(51, 79, 62, 255)` }}
+      >
         <li>
           <button
             onClick={() => setActiveComponent('users')}
-            className="w-full text-left py-3 px-6 hover:bg-gray-700"
+            className="w-full text-center py-3 px-6"
+                style={{
+                  backgroundColor:
+                    hoverSidebarElement === "users"
+                      ? `rgba(61, 89, 72, 255)`
+                      : `rgba(51, 79, 62, 255)`,
+                }}
+                onMouseEnter={() => setHoverSidebarElement("users")}
+                onMouseLeave={() => setHoverSidebarElement(null)}
           >
             Users
           </button>
@@ -39,7 +51,15 @@ const AdminDashboard = () => {
         <li>
           <button
             onClick={() => setActiveComponent('settings')}
-            className="w-full text-left py-3 px-6 hover:bg-gray-700"
+            className="w-full text-center py-3 px-6"
+                style={{
+                  backgroundColor:
+                    hoverSidebarElement === "settings"
+                      ? `rgba(61, 89, 72, 255)`
+                      : `rgba(51, 79, 62, 255)`,
+                }}
+                onMouseEnter={() => setHoverSidebarElement("settings")}
+                onMouseLeave={() => setHoverSidebarElement(null)}
           >
             Settings
           </button>
@@ -47,7 +67,15 @@ const AdminDashboard = () => {
         <li>
           <button
             onClick={() => setActiveComponent('reports')}
-            className="w-full text-left py-3 px-6 hover:bg-gray-700"
+            className="w-full text-center py-3 px-6"
+                style={{
+                  backgroundColor:
+                    hoverSidebarElement === "reports"
+                      ? `rgba(61, 89, 72, 255)`
+                      : `rgba(51, 79, 62, 255)`,
+                }}
+                onMouseEnter={() => setHoverSidebarElement("reports")}
+                onMouseLeave={() => setHoverSidebarElement(null)}
           >
             Reports
           </button>
@@ -55,7 +83,15 @@ const AdminDashboard = () => {
         <li>
           <button
             onClick={() => setActiveComponent('games')}
-            className="w-full text-left py-3 px-6 hover:bg-gray-700"
+            className="w-full text-center py-3 px-6"
+            style={{
+              backgroundColor:
+                hoverSidebarElement === "games"
+                  ? `rgba(61, 89, 72, 255)`
+                  : `rgba(51, 79, 62, 255)`,
+            }}
+            onMouseEnter={() => setHoverSidebarElement("games")}
+                onMouseLeave={() => setHoverSidebarElement(null)}
           >
             Games
           </button>
@@ -63,7 +99,15 @@ const AdminDashboard = () => {
         <li>
           <button
             onClick={() => setActiveComponent('dashboard')}
-            className="w-full text-left py-3 px-6 hover:bg-gray-700"
+            className="w-full text-center py-3 px-6"
+                style={{
+                  backgroundColor:
+                    hoverSidebarElement === "Dashboard"
+                      ? `rgba(61, 89, 72, 255)`
+                      : `rgba(51, 79, 62, 255)`,
+                }}
+                onMouseEnter={() => setHoverSidebarElement("Dashboard")}
+                onMouseLeave={() => setHoverSidebarElement(null)}
           >
             Dashboard
           </button>
@@ -74,7 +118,7 @@ const AdminDashboard = () => {
   </aside>
 
       {/* Main Content */}
-      <main className="flex-1 bg-gray-100 p-6">
+      <main className="flex-1 text-white p-6" style={{backgroundColor: "rgba(21,49,32,255)"}}>
         {renderComponent()}
       </main>
     </div>

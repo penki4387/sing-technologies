@@ -31,7 +31,7 @@ const Users = () => {
   }
 
   return (
-    <div className="p-6 bg-gray-100 h-full">
+    <div className="p-6  h-full" style={{ backgroundColor: `rgba(21, 49, 32, 255)` }}>
       <h2 className="text-2xl font-bold mb-4">Users List</h2>
       <table className="w-full bg-white rounded-lg shadow-md overflow-hidden">
         <thead className="bg-blue-500 text-white">
@@ -42,7 +42,7 @@ const Users = () => {
             <th className="px-4 py-2 text-left">Role</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className='text-black'>
           {users.map((user, index) => (
             <tr
               key={user.id}

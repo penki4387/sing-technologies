@@ -20,9 +20,9 @@ const UserDashboard = () => {
      
 
       {/* Content */}
-      <main className="flex-1 container mx-auto p-6">
-        <h2 className="text-2xl font-semibold mb-4">Hello, {user}!</h2>
-        <p className="text-gray-700 mb-6">
+      <main className="flex-1 container mx-auto p-6" style={{backgroundColor:"rgba(21,49,32,255)"}}>
+        <h2 className="text-2xl font-semibold mb-4 text-white">Hello, {user} !</h2>
+        <p className="text-white mb-6">
           Welcome to your dashboard. Here, you can explore the features and manage your account.
         </p>
 
@@ -67,12 +67,7 @@ const UserDashboard = () => {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white py-4">
-        <div className="container mx-auto text-center">
-          <p>&copy; 2024 My Application. All rights reserved.</p>
-        </div>
-      </footer>
+      
     </div>
   );
 };
