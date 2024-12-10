@@ -32,10 +32,10 @@ const Homepage = () => {
   };
 
   return (
-    <div className="flex h-100">
+    <div className="flex h-100 " style={{ backgroundColor: `rgba(21, 49, 32, 255)` }}>
       {/* Sidebar */}
       <aside
-        className="w-64 text-white flex flex-col h-100"
+        className="w-[15%] text-white flex flex-col h-screen fixed top-20 left-0"
         style={{ backgroundColor: `rgba(41, 69, 52, 255)` }}
       >
         
@@ -162,7 +162,7 @@ const Homepage = () => {
 
       {/* Main Content */}
       <main
-        className="flex-1 p-6"
+        className="flex-1 p-6 ml-[15%] overflow-y-auto mt-20"
         style={{ backgroundColor: "rgba(21,49,32,255)" }}
       >
         {renderComponent()}

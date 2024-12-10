@@ -7,16 +7,14 @@ const Header = () => {
 
   const userToken = localStorage.getItem('usertoken');
   const adminToken = localStorage.getItem('admintoken');
-  console.log(adminToken, "adminToken");
-  console.log(userToken, "userToken");
+  
   const user = localStorage.getItem('user');
   const fundingWallet = localStorage.getItem('fundingWallet');
   const supportWallet = localStorage.getItem('supportWallet');
   const visibleFundingWallet = fundingWallet ? (parseFloat(fundingWallet)).toFixed(6) : '0.00';
 
   if (userToken) {
-    console.log(fundingWallet, "fundingWallet");
-    console.log(supportWallet, "supportWallet");
+    
   }
 
   const [dropdownOpen, setDropdownOpen] = useState(false); // State to manage dropdown visibility
@@ -54,7 +52,7 @@ const Header = () => {
   };
 
   return (
-    <div className="flex flex-row justify-between items-center p-4 shadow-md" style={{ backgroundColor: `rgba(41, 69, 52, 255)` }}>
+    <div className="flex flex-row justify-between items-center p-4 shadow-md w-full fixed h-20 fixed" style={{ backgroundColor: `rgba(41, 69, 52, 255)` }}>
       <h1 className="text-white text-xl font-bold">
         <Link to="/">My App</Link>
       </h1>
@@ -227,7 +225,6 @@ const Header = () => {
         {UserLoginPage ? (
           <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2"
             onClick={() => {
-              console.log(adminToken);
               adminToken !== null ? navigate('/admin') : navigate('/admin-login');
             }}
           >
