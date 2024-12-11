@@ -48,11 +48,11 @@ router.get('/game/:id', async (req, res) => {
 
 // Create a new game
 router.post('/addgame', upload.single('image'), async (req, res) => {
-  const { name, popularity, description } = req.body;
+  const { name, popularity, description,type } = req.body;
   const image = req.file ? req.file.filename :null;
   try {
-    const query = "INSERT INTO games (name, image, popularity, description) VALUES (?, ?, ?, ?)";
-    connection.query(query, [name, image, popularity, description], (err, results) => {
+    const query = "INSERT INTO games (name, image, popularity, description,type) VALUES (?, ?, ?, ?, ?)";
+    connection.query(query, [name, image, popularity, description,type], (err, results) => {
       if (err) return res.status(500).json({ error: 'Database insertion error' });
       res.status(201).json({ message: 'Game added successfully', id: results.insertId });
     });
@@ -64,7 +64,7 @@ router.post('/addgame', upload.single('image'), async (req, res) => {
 // Update a game by ID
 router.put('/updategame/:id', upload.single('image'), async (req, res) => {
   const { id } = req.params;
-  const { name, popularity, description } = req.body;
+  const { name, popularity, description,type } = req.body;
   const image = req.file ? req.file.filename : null;
 
   try {
@@ -90,6 +90,10 @@ router.put('/updategame/:id', upload.single('image'), async (req, res) => {
       if (description) {
         updates.push("description = ?");
         values.push(description);
+      }
+      if (type) {
+        updates.push("type = ?");
+        values.push(type);
       }
       if (image) {
         updates.push("image = ?");

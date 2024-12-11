@@ -24,4 +24,20 @@ router.post('/admin-login', async (req, res) => {
   }
 });
 
+// Create a new user
+router.post('/user', async (req, res) => {
+  const { username, email, password, phone, dob } = req.body;
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
+    const query = "INSERT INTO users (username, email, password, phone, dob) VALUES (?, ?, ?, ?, ?)";
+    connection.query(query, [username, email, hashedPassword, phone, dob], (err, results) => {
+      if (err) return res.status(500).json({ error: 'Database error' });
+      res.status(201).json({ message: 'User created successfully', id: results.insertId });
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Error creating user' });
+  }
+});
+
+
 module.exports = router;

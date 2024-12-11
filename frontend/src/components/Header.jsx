@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaBitcoin, FaEthereum, FaDog, FaDollarSign, FaCog } from 'react-icons/fa';
 const Header = () => {
@@ -22,6 +22,13 @@ const Header = () => {
   const [selectedWallet, setSelectedWallet] = useState(null);
   const [hoverTimeout, setHoverTimeout] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false); // Add this state
+  const [wallet, setWallet] = useState([]);
+
+useEffect(() => {
+  const walletData = JSON.parse(localStorage.getItem('wallet')) || [];
+  console.log("Wallet Data:", walletData);
+  setWallet(walletData);
+}, []);
 
   const UserLoginPage = location.pathname === '/login' || location.pathname === '/register';
   const UserDashboardPage = location.pathname === '/';
@@ -52,7 +59,7 @@ const Header = () => {
   };
 
   return (
-    <div className="flex flex-row justify-between items-center p-4 shadow-md w-full fixed h-20 fixed" style={{ backgroundColor: `rgba(41, 69, 52, 255)` }}>
+    <div className= {!AdminPage ?"flex flex-row justify-between items-center p-4 shadow-md w-full fixed h-20 fixed":"flex flex-row justify-between items-center p-4 shadow-md w-full fixed h-20 fixed bg-gray-900"} style={ !AdminPage ? { backgroundColor: `rgba(41, 69, 52, 255)` } :null}>
       <h1 className="text-white text-xl font-bold">
         <Link to="/">My App</Link>
       </h1>
@@ -71,109 +78,32 @@ const Header = () => {
             {fundingWallet ? `${visibleFundingWallet} ▾` : '0.00'}
           </button>
           {hovered && (
-            <span className='absolute right-0 bg-white text-black w-full mt-14 rounded shadow-lg z-10 max-h-85 '>
-
-              <ul className=" max-h-70 overflow-y-auto">
-                <li className="flex flex-row justify-between p-2 hover:bg-gray-100 cursor-pointer">
-
-                  {visibleFundingWallet}
-                  <span className="flex items-center"><FaBitcoin className="text-yellow-500 mr-2" /> BTC</span>
-
-
+            <div className="absolute right-0 bg-white text-black w-full mt-14 rounded shadow-lg z-10 max-h-85 ">
+            <ul className="max-h-70 overflow-y-auto">
+              <span className="absolute right-0 bg-white text-black w-full mt-14 rounded shadow-lg z-[1050] max-h-85">
+              {wallet.map((entry, index) => (
+                <li key={index} className="flex flex-row justify-between p-2 hover:bg-gray-100 cursor-pointer">
+                  <span>{parseFloat(entry.balance).toFixed(6)}</span>
+                  <span className="flex items-center">
+                    {entry.cryptoname}
+                  </span>
                 </li>
-                <li className="flex flex-row justify-between p-2 hover:bg-gray-100 cursor-pointer">
-                  {visibleFundingWallet}
-                  <span className="flex items-center"><FaEthereum className="text-blue-500 mr-2" /> ETH</span>
-                </li>
-
-                <li className="flex flex-row justify-between p-2 hover:bg-gray-100 cursor-pointer">
-                  {visibleFundingWallet}
-                  <span className="flex items-center"><FaDog className="text-gray-500 mr-2" /> DOGE</span>
-                </li>
-
-                <li className="flex flex-row justify-between p-2 hover:bg-gray-100 cursor-pointer">
-                  {visibleFundingWallet}
-                  <span className="flex items-center"><FaBitcoin className="text-yellow-500 mr-2" /> BTC</span>
-                </li>
-                <li className="flex flex-row justify-between p-2 hover:bg-gray-100 cursor-pointer">
-
-                  {visibleFundingWallet}
-                  <span className="flex items-center"><FaBitcoin className="text-yellow-500 mr-2" /> BTC</span>
-
-
-                </li>
-                <li className="flex flex-row justify-between p-2 hover:bg-gray-100 cursor-pointer">
-                  {visibleFundingWallet}
-                  <span className="flex items-center"><FaEthereum className="text-blue-500 mr-2" /> ETH</span>
-                </li>
-
-                <li className="flex flex-row justify-between p-2 hover:bg-gray-100 cursor-pointer">
-                  {visibleFundingWallet}
-                  <span className="flex items-center"><FaDog className="text-gray-500 mr-2" /> DOGE</span>
-                </li>
-
-                <li className="flex flex-row justify-between p-2 hover:bg-gray-100 cursor-pointer">
-                  {visibleFundingWallet}
-                  <span className="flex items-center"><FaBitcoin className="text-yellow-500 mr-2" /> BTC</span>
-                </li>
-                <li className="flex flex-row justify-between p-2 hover:bg-gray-100 cursor-pointer">
-
-                  {visibleFundingWallet}
-                  <span className="flex items-center"><FaBitcoin className="text-yellow-500 mr-2" /> BTC</span>
-
-
-                </li>
-                <li className="flex flex-row justify-between p-2 hover:bg-gray-100 cursor-pointer">
-                  {visibleFundingWallet}
-                  <span className="flex items-center"><FaEthereum className="text-blue-500 mr-2" /> ETH</span>
-                </li>
-
-                <li className="flex flex-row justify-between p-2 hover:bg-gray-100 cursor-pointer">
-                  {visibleFundingWallet}
-                  <span className="flex items-center"><FaDog className="text-gray-500 mr-2" /> DOGE</span>
-                </li>
-
-                <li className="flex flex-row justify-between p-2 hover:bg-gray-100 cursor-pointer">
-                  {visibleFundingWallet}
-                  <span className="flex items-center"><FaBitcoin className="text-yellow-500 mr-2" /> BTC</span>
-                </li>
-                <li className="flex flex-row justify-between p-2 hover:bg-gray-100 cursor-pointer">
-
-                  {visibleFundingWallet}
-                  <span className="flex items-center"><FaBitcoin className="text-yellow-500 mr-2" /> BTC</span>
-
-
-                </li>
-                <li className="flex flex-row justify-between p-2 hover:bg-gray-100 cursor-pointer">
-                  {visibleFundingWallet}
-                  <span className="flex items-center"><FaEthereum className="text-blue-500 mr-2" /> ETH</span>
-                </li>
-
-                <li className="flex flex-row justify-between p-2 hover:bg-gray-100 cursor-pointer">
-                  {visibleFundingWallet}
-                  <span className="flex items-center"><FaDog className="text-gray-500 mr-2" /> DOGE</span>
-                </li>
-
-                <li className="flex flex-row justify-between p-2 hover:bg-gray-100 cursor-pointer">
-                  {visibleFundingWallet}
-                  <span className="flex items-center"><FaBitcoin className="text-yellow-500 mr-2" /> BTC</span>
-                </li>
-
-              </ul>
-              <hr />
-              <span>
-
-                <button
+              ))}
+              </span>
+            </ul>
+            <button
                   className='flex flex-row justify-center items-center p-2 hover:bg-gray-100 cursor-pointer mx-auto my-2 border rounded'
                 >
                   <FaCog className="text-gray-500 mr-2" />Wallet Setting
                 </button>
-              </span>
+              
+          </div>
+                
 
 
 
 
-            </span>
+            
           )}
           <button
             onClick={toggleModal}
@@ -243,7 +173,7 @@ const Header = () => {
 
           ) : (
             <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"
+              className={!AdminPage ? "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2" : "bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded ml-2"}
               onClick={() => navigate('/')}  // Redirect to homepage if already logged in
             >
               Go to User Admin

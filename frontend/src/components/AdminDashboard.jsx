@@ -26,23 +26,18 @@ const AdminDashboard = () => {
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      <aside className="w-64  text-white flex flex-col mt-20 " style={{ backgroundColor: `rgba(41, 69, 52, 255)` }}>
-      <h2 className="text-xl font-bold py-4 px-6 my-2 mx-4" style={{ backgroundColor: `rgba(51, 79, 62, 255)` }}>User Dashboard </h2>
+      <aside className="w-64  text-white flex flex-col mt-20 bg-gray-900  " >{/*style={{ backgroundColor: `rgba(41, 69, 52, 255)` }}*/}
+      <h2 className="text-xl font-bold py-4 px-6 my-2 mx-4 bg-gray-700 " >Admin Dashboard </h2>{/*style={{ backgroundColor: `rgba(51, 79, 62, 255)` }}*/}
     <nav className="flex-1">
       <ul
-      className="flex flex-col rounded-lg shadow-md p-2 mx-4 my-0"
-      style={{ backgroundColor: `rgba(51, 79, 62, 255)` }}
-      >
+      className="flex flex-col rounded-lg shadow-md p-2 mx-4 my-0 bg-gray-700"
+      
+      > {/*style={{ backgroundColor: `rgba(51, 79, 62, 255)` }} */}
         <li>
           <button
             onClick={() => setActiveComponent('users')}
-            className="w-full text-center py-3 px-6"
-                style={{
-                  backgroundColor:
-                    hoverSidebarElement === "users"
-                      ? `rgba(61, 89, 72, 255)`
-                      : `rgba(51, 79, 62, 255)`,
-                }}
+            className= {hoverSidebarElement === "Dashboard" ? "w-full text-center py-3 px-6 bg-gray-600" : "w-full text-center py-3 px-6 bg-gray-700"}
+                
                 onMouseEnter={() => setHoverSidebarElement("users")}
                 onMouseLeave={() => setHoverSidebarElement(null)}
           >
@@ -52,13 +47,8 @@ const AdminDashboard = () => {
         <li>
           <button
             onClick={() => setActiveComponent('settings')}
-            className="w-full text-center py-3 px-6"
-                style={{
-                  backgroundColor:
-                    hoverSidebarElement === "settings"
-                      ? `rgba(61, 89, 72, 255)`
-                      : `rgba(51, 79, 62, 255)`,
-                }}
+            className= {hoverSidebarElement === "Dashboard" ? "w-full text-center py-3 px-6 bg-gray-600" : "w-full text-center py-3 px-6 bg-gray-700"}
+               
                 onMouseEnter={() => setHoverSidebarElement("settings")}
                 onMouseLeave={() => setHoverSidebarElement(null)}
           >
@@ -68,13 +58,8 @@ const AdminDashboard = () => {
         <li>
           <button
             onClick={() => setActiveComponent('reports')}
-            className="w-full text-center py-3 px-6"
-                style={{
-                  backgroundColor:
-                    hoverSidebarElement === "reports"
-                      ? `rgba(61, 89, 72, 255)`
-                      : `rgba(51, 79, 62, 255)`,
-                }}
+            className= {hoverSidebarElement === "Dashboard" ? "w-full text-center py-3 px-6 bg-gray-600" : "w-full text-center py-3 px-6 bg-gray-700"}
+                
                 onMouseEnter={() => setHoverSidebarElement("reports")}
                 onMouseLeave={() => setHoverSidebarElement(null)}
           >
@@ -84,13 +69,8 @@ const AdminDashboard = () => {
         <li>
           <button
             onClick={() => setActiveComponent('games')}
-            className="w-full text-center py-3 px-6"
-            style={{
-              backgroundColor:
-                hoverSidebarElement === "games"
-                  ? `rgba(61, 89, 72, 255)`
-                  : `rgba(51, 79, 62, 255)`,
-            }}
+            className= {hoverSidebarElement === "Dashboard" ? "w-full text-center py-3 px-6 bg-gray-600" : "w-full text-center py-3 px-6 bg-gray-700"}
+           
             onMouseEnter={() => setHoverSidebarElement("games")}
                 onMouseLeave={() => setHoverSidebarElement(null)}
           >
@@ -100,13 +80,8 @@ const AdminDashboard = () => {
         <li>
           <button
             onClick={() => setActiveComponent('dashboard')}
-            className="w-full text-center py-3 px-6"
-                style={{
-                  backgroundColor:
-                    hoverSidebarElement === "Dashboard"
-                      ? `rgba(61, 89, 72, 255)`
-                      : `rgba(51, 79, 62, 255)`,
-                }}
+            className= {hoverSidebarElement === "Dashboard" ? "w-full text-center py-3 px-6 bg-gray-600" : "w-full text-center py-3 px-6 bg-gray-700"}
+               
                 onMouseEnter={() => setHoverSidebarElement("Dashboard")}
                 onMouseLeave={() => setHoverSidebarElement(null)}
           >
@@ -119,7 +94,7 @@ const AdminDashboard = () => {
   </aside>
 
       {/* Main Content */}
-      <main className="flex-1 text-white p-6 mt-20" style={{backgroundColor: "rgba(21,49,32,255)"}}>
+      <main className="flex-1 text-black p-6 mt-20 bg-white overflow-y-auto" >
         {renderComponent()}
       </main>
     </div>

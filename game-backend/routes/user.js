@@ -8,24 +8,53 @@ const router = express.Router();
 // User registration
 router.post('/register', async (req, res) => {
   const { name, email, password, phoneNumber, dob, referalCode } = req.body;
+
   try {
+    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Insert the user into the 'users' table
     const query = "INSERT INTO users (username, email, password, phone, dob, code) VALUES (?, ?, ?, ?, ?, ?)";
     connection.query(query, [name, email, hashedPassword, phoneNumber, dob, referalCode], (err, results) => {
       if (err) {
         console.log(err);
-        return res.status(500).json({ error: 'Database error' });}
-      res.status(201).json({ message: 'User registered successfully' });
+        return res.status(500).json({ error: 'Database error' });
+      }
+
+      // Get the newly created user's ID
+      const userId = results.insertId;
+
+      // List of cryptocurrencies
+      const cryptocurrencies = ['BNB', 'USDC', 'APE', 'BUSD', 'CRO', 'DAI', 'LINK', 'SAND', 'SHIB', 'UNI', 'INR'];
+
+      // Generate wallet entries for the new user
+      const walletQuery = "INSERT INTO wallet (userId, balance, cryptoname) VALUES ?";
+      const walletValues = cryptocurrencies.map(crypto => [userId, 0, crypto]);
+
+      // Insert wallet entries into the 'wallet' table
+      connection.query(walletQuery, [walletValues], (err, walletResults) => {
+        if (err) {
+          console.log(err);
+          return res.status(500).json({ error: 'Error creating wallet entries' });
+        }
+
+        // Respond with a success message
+        res.status(201).json({ message: 'User registered and wallet initialized successfully' });
+      });
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: 'Error registering user' });
   }
 });
 
+
 // User login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
+
   try {
+    // Query to find the user by email
     const query = "SELECT * FROM users WHERE email = ?";
     connection.query(query, [email], async (err, results) => {
       if (err) return res.status(500).json({ error: 'Database query error' });
@@ -35,13 +64,34 @@ router.post('/login', async (req, res) => {
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) return res.status(401).json({ error: 'Invalid credentials' });
 
-      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-      res.json({ token, user: user.username, fundingWallet: user.fundingWallet, supportWallet: user.supportWallet });
+      // Fetch wallet details for the logged-in user
+      const walletQuery = "SELECT * FROM wallet WHERE userId = ?";
+      connection.query(walletQuery, [user.id], (err, walletResults) => {
+        if (err) return res.status(500).json({ error: 'Error fetching wallet data' });
+
+        // Generate JWT token
+        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        // Send the user profile and wallet data in the response
+        res.json({
+          token,
+          user: {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            fundingWallet: user.fundingWallet,
+            supportWallet: user.supportWallet,
+          },
+          wallet: walletResults, // Include wallet data
+        });
+      });
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Error logging in user' });
   }
 });
+
 
 // Get all users
 router.get('/allusers', async (req, res) => {
@@ -68,6 +118,39 @@ router.get('/user/:name', async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ error: 'Error fetching user' });
+  }
+});
+
+
+
+// Delete user by ID
+router.delete('/user/:id', async (req, res) => {
+  const userId = req.params.id;
+  try {
+    const query = "DELETE FROM users WHERE id = ?";
+    connection.query(query, [userId], (err, results) => {
+      if (err) return res.status(500).json({ error: 'Database query error' });
+      if (results.affectedRows === 0) return res.status(404).json({ error: 'User not found' });
+      res.json({ message: 'User deleted successfully' });
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Error deleting user' });
+  }
+});
+
+// Update user by ID
+router.put('/user/:id', async (req, res) => {
+  const userId = req.params.id;
+  const { username, email, phone, dob } = req.body;
+  try {
+    const query = "UPDATE users SET username = ?, email = ?, phone = ?, dob = ? WHERE id = ?";
+    connection.query(query, [username, email, phone, dob, userId], (err, results) => {
+      if (err) return res.status(500).json({ error: 'Database query error' });
+      if (results.affectedRows === 0) return res.status(404).json({ error: 'User not found' });
+      res.json({ message: 'User updated successfully' });
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Error updating user' });
   }
 });
 module.exports = router;

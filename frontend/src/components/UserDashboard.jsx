@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import "./UserDashboard.css";
+import {BASE_URL} from "../constants/config";
 
 const UserDashboard = () => {
   const user = localStorage.getItem('username') || "VikramSah291";
@@ -119,7 +120,7 @@ const UserDashboard = () => {
               >
                 {/* Game Image */}
                 <img
-                  src={game.image}
+                  src={game.image.startsWith('./') ? game.image : `${BASE_URL}/uploads/${game.image}`}
                   alt={game.name}
                   className="w-full h-32 object-cover"
                 />

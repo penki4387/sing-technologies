@@ -11,6 +11,7 @@ const Games = () => {
         popularity: "",
         description: "",
         image: null,
+        type:""
     });
     const [editing, setEditing] = useState(false);
     const [showForm, setShowForm] = useState(false);
@@ -66,6 +67,7 @@ const Games = () => {
         data.append("name", formData.name);
         data.append("popularity", formData.popularity);
         data.append("description", formData.description);
+        data.append("type", formData.type);
         if (formData.image) data.append("image", formData.image);
 
         try {
@@ -95,7 +97,8 @@ const Games = () => {
             name: game.name,
             popularity: game.popularity,
             description: game.description,
-            image: game.image.startsWith('./') ? game.image : `${BASE_URL}/uploads/${game.image}`
+            image: game.image.startsWith('./') ? game.image : `${BASE_URL}/uploads/${game.image}`,
+            type:game.type
         });
         setEditing(true);
         setShowForm(true);
@@ -121,6 +124,7 @@ const Games = () => {
             popularity: "",
             description: "",
             image: null,
+            type:""
         });
         setEditing(false);
         setShowForm(false); // Ensure the form closes on reset
@@ -132,18 +136,18 @@ const Games = () => {
     }, []);
 
     return (
-        <div className="h-full" style={{ backgroundColor: "rgba(21,49,32,255)" }}>
+        <div className="h-full bg-white" >{/* style={{ backgroundColor: "rgba(21,49,32,255)" }} */}
             {games.length > 0 && !showForm && (
                 <div className="block right-0 top-20 fixed">
                     <button
                         onClick={() => setShowForm(true)}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-blue-700"
                     >
                         Add a New Game
                     </button>
                 </div>
             )}
-            <h1 className="text-2xl font-bold text-white mb-20 flex justify-center items-center">
+            <h1 className="text-2xl font-bold text-black mb-20 flex justify-center items-center">
                 Games Management
             </h1>
 
@@ -190,6 +194,19 @@ const Games = () => {
                             required
                         />
                     </div>
+                    <div className="mb-4">
+                        <label className="block text-black font-medium mb-2">Type</label>
+                        <input
+                            type="text"
+                            name="type"
+                            value={formData?.type}
+                            onChange={handleInputChange}
+                            placeholder={formData.type}
+                            className="w-full p-3 text-black border rounded-lg focus:outline-none focus:ring focus:ring-green-300"
+                            required
+                        />
+                    </div>
+                    
 
                     {/* Description Field */}
                     <div className="mb-4">
@@ -250,7 +267,7 @@ const Games = () => {
             )}
 
             {/* Game List Section */}
-            <div>
+            <div className="flex flex-wrap justify-center mt-10">
                 {!editing && !showForm && (
                     <Carousel
                         items={games}

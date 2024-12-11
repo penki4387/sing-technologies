@@ -16,21 +16,6 @@ const Login = () => {
     localStorage.setItem(key, JSON.stringify(item));
   };
   
-  const getWithExpiry = (key) => {
-    const itemStr = localStorage.getItem(key);
-    if (!itemStr) {
-      return null;
-    }
-    const item = JSON.parse(itemStr);
-    const now = new Date();
-    if (now.getTime() > item.expiry) {
-      localStorage.removeItem(key);
-      return null;
-    }
-    return item.value;
-  };
-  
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -38,16 +23,25 @@ const Login = () => {
         email,
         password,
       });
-      
-      console.log(response.data.token,response.data.user, response.data.fundingWallet, response.data.supportWallet);
+
+      const { token, user, wallet } = response.data;
+
+      console.log("Token:", token);
+      console.log("User:", user);
+      console.log("Wallet:", wallet);
+
       const twoHoursInMs = 2 * 60 * 60 * 1000; // Two hours in milliseconds
 
-      setWithExpiry('usertoken', response.data.token, twoHoursInMs);
-      localStorage.setItem('username', response.data.user);
-      localStorage.setItem('fundingWallet', response.data.fundingWallet);
-      localStorage.setItem('supportWallet', response.data.supportWallet);
+      // Save token and user data to localStorage
+      setWithExpiry('usertoken', token, twoHoursInMs);
+      localStorage.setItem('username', user.username);
+      localStorage.setItem('email', user.email);
+
+      // Store wallet data in localStorage
+      localStorage.setItem('wallet', JSON.stringify(wallet));
+
       alert('Login successful!');
-      navigate('/');
+      navigate('/dashboard'); // Redirect to dashboard or home page
     } catch (error) {
       console.error(error);
       alert('Invalid credentials');
@@ -55,9 +49,9 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center " style={{backgroundColor:"rgba(21,49,32,255)"}}>
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "rgba(21,49,32,255)" }}>
       <form
-        className="w-full max-w-sm  bg-white p-6 rounded-lg shadow-md"
+        className="w-full max-w-sm bg-white p-6 rounded-lg shadow-md"
         onSubmit={handleSubmit}
       >
         <h2 className="text-2xl font-semibold text-center mb-6">User Login</h2>
@@ -81,7 +75,9 @@ const Login = () => {
         >
           Login
         </button>
-        <p>Don't have an account ? <Link to="/register">Register</Link></p>
+        <p>
+          Don't have an account? <Link to="/register">Register</Link>
+        </p>
       </form>
     </div>
   );
