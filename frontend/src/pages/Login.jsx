@@ -29,6 +29,9 @@ const Login = () => {
       console.log("Token:", token);
       console.log("User:", user);
       console.log("Wallet:", wallet);
+      console.log('fundingWallet:', user.fundingWallet);
+      console.log('supportWallet:', user.supportWallet);
+
 
       const twoHoursInMs = 2 * 60 * 60 * 1000; // Two hours in milliseconds
 
@@ -36,6 +39,8 @@ const Login = () => {
       setWithExpiry('usertoken', token, twoHoursInMs);
       localStorage.setItem('username', user.username);
       localStorage.setItem('email', user.email);
+      localStorage.setItem('fundingWallet', user.fundingWallet);
+      localStorage.setItem('supportWallet', user.supportWallet);
 
       // Store wallet data in localStorage
       localStorage.setItem('wallet', JSON.stringify(wallet));

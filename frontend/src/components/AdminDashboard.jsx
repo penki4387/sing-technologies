@@ -26,7 +26,7 @@ const AdminDashboard = () => {
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      <aside className="w-64  text-white flex flex-col mt-20 bg-gray-900  " >{/*style={{ backgroundColor: `rgba(41, 69, 52, 255)` }}*/}
+      <aside className="w-64  text-white flex flex-col mt-20 bg-gray-900 z-20  " >{/*style={{ backgroundColor: `rgba(41, 69, 52, 255)` }}*/}
       <h2 className="text-xl font-bold py-4 px-6 my-2 mx-4 bg-gray-700 " >Admin Dashboard </h2>{/*style={{ backgroundColor: `rgba(51, 79, 62, 255)` }}*/}
     <nav className="flex-1">
       <ul
@@ -94,7 +94,7 @@ const AdminDashboard = () => {
   </aside>
 
       {/* Main Content */}
-      <main className="flex-1 text-black p-6 mt-20 bg-white overflow-y-auto" >
+      <main className="flex-1 text-black p-6 mt-20 bg-white overflow-y-auto z-10" >
         {renderComponent()}
       </main>
     </div>

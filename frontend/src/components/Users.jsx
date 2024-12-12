@@ -89,7 +89,7 @@ const Users = () => {
      
       <h2 className="text-3xl font-bold top-25 text-center mb-6">User Management</h2>
 
-      {/* Add New User Button */}
+      
       
 
       {/* New User Form */}
@@ -124,13 +124,11 @@ const Users = () => {
               name="email"
               required
             />
-            <PasswordInput
-              value=""
+            <input
+              type="text"
               placeholder="Password"
-              onChange={(e) => {
-                e.target.setAttribute('name', 'password'); // Ensure password field has a name attribute
-              }}
               className="w-full p-3 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400"
+              name="password"
               required
             />
             <input
@@ -158,7 +156,8 @@ const Users = () => {
       )}
 
       {/* Users Table */}
-      <table className="w-full bg-white rounded-lg shadow-md overflow-hidden">
+      {users.length > 0 ? (
+        <table className="w-full bg-white rounded-lg shadow-md overflow-hidden">
         <thead className="bg-blue-500 text-white">
           <tr>
             <th className="px-4 py-2 text-left">#</th>
@@ -223,6 +222,12 @@ const Users = () => {
           ))}
         </tbody>
       </table>
+      ):(
+        <div>
+          No User Available
+        </div>
+      )}
+      
     </div>
   );
 };

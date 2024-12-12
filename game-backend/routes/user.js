@@ -25,7 +25,7 @@ router.post('/register', async (req, res) => {
       const userId = results.insertId;
 
       // List of cryptocurrencies
-      const cryptocurrencies = ['BNB', 'USDC', 'APE', 'BUSD', 'CRO', 'DAI', 'LINK', 'SAND', 'SHIB', 'UNI', 'INR'];
+      const cryptocurrencies = ['BNB', 'USDC', 'APE', 'BUSD', 'CRO', 'DAI', 'LINK', 'SAND', 'SHIB', 'UNI', 'INR','CP'];
 
       // Generate wallet entries for the new user
       const walletQuery = "INSERT INTO wallet (userId, balance, cryptoname) VALUES ?";
@@ -61,6 +61,7 @@ router.post('/login', async (req, res) => {
       if (results.length === 0) return res.status(404).json({ error: 'User not found' });
 
       const user = results[0];
+      
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) return res.status(401).json({ error: 'Invalid credentials' });
 
@@ -79,8 +80,10 @@ router.post('/login', async (req, res) => {
             id: user.id,
             username: user.username,
             email: user.email,
-            fundingWallet: user.fundingWallet,
-            supportWallet: user.supportWallet,
+            phone: user.phone,
+            dob: user.dob,
+            referalCode: user.code
+            
           },
           wallet: walletResults, // Include wallet data
         });
@@ -126,17 +129,54 @@ router.get('/user/:name', async (req, res) => {
 // Delete user by ID
 router.delete('/user/:id', async (req, res) => {
   const userId = req.params.id;
+
   try {
-    const query = "DELETE FROM users WHERE id = ?";
-    connection.query(query, [userId], (err, results) => {
-      if (err) return res.status(500).json({ error: 'Database query error' });
-      if (results.affectedRows === 0) return res.status(404).json({ error: 'User not found' });
-      res.json({ message: 'User deleted successfully' });
+    // Start a transaction to delete wallets and the user atomically
+    connection.beginTransaction((err) => {
+      if (err) return res.status(500).json({ error: 'Error starting transaction' });
+
+      // Delete wallets associated with the user
+      const deleteWalletsQuery = "DELETE FROM wallet WHERE userId = ?";
+      connection.query(deleteWalletsQuery, [userId], (err, walletResults) => {
+        if (err) {
+          return connection.rollback(() => {
+            res.status(500).json({ error: 'Error deleting wallets' });
+          });
+        }
+
+        // Delete the user
+        const deleteUserQuery = "DELETE FROM users WHERE id = ?";
+        connection.query(deleteUserQuery, [userId], (err, userResults) => {
+          if (err) {
+            return connection.rollback(() => {
+              res.status(500).json({ error: 'Error deleting user' });
+            });
+          }
+
+          if (userResults.affectedRows === 0) {
+            return connection.rollback(() => {
+              res.status(404).json({ error: 'User not found' });
+            });
+          }
+
+          // Commit the transaction
+          connection.commit((err) => {
+            if (err) {
+              return connection.rollback(() => {
+                res.status(500).json({ error: 'Error committing transaction' });
+              });
+            }
+
+            res.json({ message: 'User and associated wallets deleted successfully' });
+          });
+        });
+      });
     });
   } catch (error) {
-    res.status(500).json({ error: 'Error deleting user' });
+    res.status(500).json({ error: 'Error deleting user and wallets' });
   }
 });
+
 
 // Update user by ID
 router.put('/user/:id', async (req, res) => {

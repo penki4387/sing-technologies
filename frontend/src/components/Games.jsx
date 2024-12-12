@@ -11,12 +11,19 @@ const Games = () => {
         popularity: "",
         description: "",
         image: null,
-        type:""
+        type: ""
     });
     const [editing, setEditing] = useState(false);
     const [showForm, setShowForm] = useState(false);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
     const [canScrollRight, setCanScrollRight] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const gamesPerPage = 8; // Number of games per page
+    const indexOfLastGame = currentPage * gamesPerPage;
+    const indexOfFirstGame = indexOfLastGame - gamesPerPage;
+    const currentGames = games.slice(indexOfFirstGame, indexOfLastGame);
+
+
 
     const fetchGames = async () => {
         try {
@@ -32,6 +39,17 @@ const Games = () => {
         }
     };
 
+    const totalPages = Math.ceil(games.length / gamesPerPage);
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    };
+
+    const handlePreviousPage = () => {
+        if (currentPage > 1) setCurrentPage(currentPage - 1);
+    };
+
+
 
     const updateScrollButtons = (containerId) => {
         const container = document.getElementById(containerId);
@@ -39,17 +57,17 @@ const Games = () => {
         setCanScrollRight(container.scrollLeft < container.scrollWidth - container.clientWidth);
     };
 
-    const scrollGames = (direction) => {
-        const container = document.getElementById("gamesContainer");
-        const scrollAmount = 200;
-        if (direction === "left") container.scrollLeft -= scrollAmount;
-        else container.scrollLeft += scrollAmount;
-        updateScrollButtons("gamesContainer");
-    };
+    // const scrollGames = (direction) => {
+    //     const container = document.getElementById("gamesContainer");
+    //     const scrollAmount = 200;
+    //     if (direction === "left") container.scrollLeft -= scrollAmount;
+    //     else container.scrollLeft += scrollAmount;
+    //     updateScrollButtons("gamesContainer");
+    // };
 
-    useEffect(() => {
-        updateScrollButtons("gamesContainer");
-    }, [games]);
+    // useEffect(() => {
+    //     updateScrollButtons("gamesContainer");
+    // }, [games]);
 
     const handleInputChange = (e) => {
         const { name, value, files } = e.target;
@@ -98,7 +116,7 @@ const Games = () => {
             popularity: game.popularity,
             description: game.description,
             image: game.image.startsWith('./') ? game.image : `${BASE_URL}/uploads/${game.image}`,
-            type:game.type
+            type: game.type
         });
         setEditing(true);
         setShowForm(true);
@@ -124,7 +142,7 @@ const Games = () => {
             popularity: "",
             description: "",
             image: null,
-            type:""
+            type: ""
         });
         setEditing(false);
         setShowForm(false); // Ensure the form closes on reset
@@ -147,7 +165,7 @@ const Games = () => {
                     </button>
                 </div>
             )}
-            <h1 className="text-2xl font-bold text-black mb-20 flex justify-center items-center">
+            <h1 className="text-2xl font-bold text-black mb-10 flex justify-center items-center">
                 Games Management
             </h1>
 
@@ -206,7 +224,7 @@ const Games = () => {
                             required
                         />
                     </div>
-                    
+
 
                     {/* Description Field */}
                     <div className="mb-4">
@@ -267,55 +285,97 @@ const Games = () => {
             )}
 
             {/* Game List Section */}
-            <div className="flex flex-wrap justify-center mt-10">
+            <div className="flex justify-center mt-5">
                 {!editing && !showForm && (
-                    <Carousel
-                        items={games}
-                        containerId="gamesContainer"
-                        scrollFunction={scrollGames}
-                        renderItem={(game, index) => (
-                            <div key={index} className="min-w-[15%] relative rounded-lg overflow-hidden bg-gray-800 hover:scale-105 transition duration-300">
-                                {/* Game Image */}
-                                <img
-                                    src={game.image.startsWith('./') ? game.image : `${BASE_URL}/uploads/${game.image}`}
-                                    alt={game.name}
-                                    className="w-full h-32 object-cover"
-                                />
+                    <div>
+                        {games && games.length > 0 ? (
+                            <div className="overflow-x-auto">
+                                <table className="table-auto w-full bg-gray-800 text-white border-collapse border border-gray-700 rounded-lg">
+                                    <thead>
+                                        <tr>
+                                            <th className="border border-gray-700 px-4 py-2">Image</th>
+                                            <th className="border border-gray-700 px-4 py-2">Name</th>
+                                            <th className="border border-gray-700 px-4 py-2">Game Type</th>
+                                            <th className="border border-gray-700 px-4 py-2">Popularity</th>
+                                            <th className="border border-gray-700 px-4 py-2">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {currentGames.map((game, index) => (
+                                            <tr key={index} className="hover:bg-gray-700">
+                                                {/* Game Image */}
+                                                <td className="border border-gray-700 px-4 py-1">
+                                                    <img
+                                                        src={game.image.startsWith('./') ? game.image : `${BASE_URL}/uploads/${game.image}`}
+                                                        alt={game.name}
+                                                        className="w-16 h-16 object-cover rounded-lg"
+                                                    />
+                                                </td>
 
-                                {/* Game Details Overlay */}
-                                <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-between p-4">
-                                    {/* Game Name */}
-                                    <p className="text-lg font-bold text-white text-center">{game.name}</p>
+                                                {/* Game Name */}
+                                                <td className="border border-gray-700 px-4 py-1 text-center">
+                                                    <p className="text-lg font-semibold">{game.name}</p>
+                                                </td>
+                                                <td className="border border-gray-700 px-4 py-1 text-center">
+                                                    <p className="text-lg font-semibold">{game.type}</p>
+                                                </td>
+                                                <td className="border border-gray-700 px-4 py-1 text-center">
+                                                    <p className="text-lg font-semibold">{game.popularity}</p>
+                                                </td>
 
+                                                {/* Action Buttons */}
+                                                <td className="border border-gray-700 px-4 py-1 text-center">
+                                                    <div className="flex justify-center gap-4">
+                                                        {/* Edit Button */}
+                                                        <button
+                                                            onClick={() => handleEdit(game)}
+                                                            className="text-blue-500 hover:text-blue-700 transition"
+                                                        >
+                                                            <FaEdit size={20} />
+                                                        </button>
 
-                                    <div className="flex justify-between ">
+                                                        {/* Delete Button */}
+                                                        <button
+                                                            onClick={() => handleDelete(game.id)}
+                                                            className="text-red-500 hover:text-red-700 transition"
+                                                        >
+                                                            <FaTrash size={20} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
 
-                                        <button
-                                            onClick={() => handleEdit(game)}
-                                            className=""
-                                        >
-                                            <FaEdit />
-
-                                        </button>
-
-                                        {/* Delete Button */}
-                                        <button
-                                            onClick={() => handleDelete(game.id)}
-                                            className="text-red"
-                                        >
-                                            <FaTrash />
-                                        </button>
-                                    </div>
+                                {/* Pagination Buttons */}
+                                <div className="flex justify-center mt-4 gap-4">
+                                    <button
+                                        onClick={handlePreviousPage}
+                                        disabled={currentPage === 1}
+                                        className={`px-4 py-2 rounded-lg ${currentPage === 1 ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
+                                    >
+                                        Previous
+                                    </button>
+                                    <span className="text-white">
+                                        Page {currentPage} of {totalPages}
+                                    </span>
+                                    <button
+                                        onClick={handleNextPage}
+                                        disabled={currentPage === totalPages}
+                                        className={`px-4 py-2 rounded-lg ${currentPage === totalPages ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
+                                    >
+                                        Next
+                                    </button>
                                 </div>
                             </div>
+                        ) : (
+                            <p className="text-center text-gray-400">No games available</p>
                         )}
-                    />
-
+                    </div>
                 )}
-
-
-
             </div>
+
         </div>
     );
 };

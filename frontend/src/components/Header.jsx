@@ -1,6 +1,6 @@
 import React, { useState,useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaBitcoin, FaEthereum, FaDog, FaDollarSign, FaCog } from 'react-icons/fa';
+import {FaCog } from 'react-icons/fa';
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -11,11 +11,29 @@ const Header = () => {
   const user = localStorage.getItem('user');
   const fundingWallet = localStorage.getItem('fundingWallet');
   const supportWallet = localStorage.getItem('supportWallet');
+  console.log(fundingWallet, "fundingWallet");
   const visibleFundingWallet = fundingWallet ? (parseFloat(fundingWallet)).toFixed(6) : '0.00';
 
-  if (userToken) {
+
+  const getCryptoIcon = (symbol) => {
     
-  }
+    try {
+      return require(`cryptocurrency-icons/svg/color/${symbol.toLowerCase()}.svg`);
+    } catch {
+      if (symbol.toLowerCase() === 'busd') {
+        return "./busd.png"; // Your custom BUSD icon path
+      }else if (symbol.toLowerCase() === 'cro') {
+        return "./cro.png";
+      }else if (symbol.toLowerCase() === 'shib') {
+        return "./shib.png";
+      }else if(symbol.toLowerCase() === 'inr'){
+        return "./inr.png";
+      }else if(symbol.toLowerCase() === 'cp'){
+        return "./inr.png";
+      }
+      return require('cryptocurrency-icons/svg/color/generic.svg'); // Fallback for unknown currencies
+    }
+  };
 
   const [dropdownOpen, setDropdownOpen] = useState(false); // State to manage dropdown visibility
   const [hovered, setHovered] = useState(false);
@@ -59,7 +77,7 @@ useEffect(() => {
   };
 
   return (
-    <div className= {!AdminPage ?"flex flex-row justify-between items-center p-4 shadow-md w-full fixed h-20 fixed":"flex flex-row justify-between items-center p-4 shadow-md w-full fixed h-20 fixed bg-gray-900"} style={ !AdminPage ? { backgroundColor: `rgba(41, 69, 52, 255)` } :null}>
+    <div className= {!AdminPage ?"flex flex-row justify-between items-center p-4 shadow-md w-full fixed h-20 fixed z-50":"flex flex-row justify-between items-center p-4 shadow-md w-full fixed h-20 fixed bg-gray-900 z-50"} style={ !AdminPage ? { backgroundColor: `rgba(41, 69, 52, 255)` } :null}>
       <h1 className="text-white text-xl font-bold">
         <Link to="/">My App</Link>
       </h1>
@@ -75,19 +93,29 @@ useEffect(() => {
 
             className="bg-gray-800 text-white py-2 px-8  hover:border-transparent rounded"
           >
-            {fundingWallet ? `${visibleFundingWallet} ▾` : '0.00'}
+            {fundingWallet ? `${visibleFundingWallet || 0.000000} ▾` : '0.00'}
           </button>
           {hovered && (
-            <div className="absolute right-0 bg-white text-black w-full mt-14 rounded shadow-lg z-10 max-h-85 ">
+            <div className="flex flex-col absolute right-0 bg-white text-black w-full mt-5 rounded shadow-lg z-50 max-h-85">
             <ul className="max-h-70 overflow-y-auto">
               <span className="absolute right-0 bg-white text-black w-full mt-14 rounded shadow-lg z-[1050] max-h-85">
               {wallet.map((entry, index) => (
-                <li key={index} className="flex flex-row justify-between p-2 hover:bg-gray-100 cursor-pointer">
-                  <span>{parseFloat(entry.balance).toFixed(6)}</span>
-                  <span className="flex items-center">
-                    {entry.cryptoname}
-                  </span>
-                </li>
+                <li
+                key={index}
+                className="flex flex-row justify-between items-center p-2 hover:bg-gray-100 cursor-pointer"
+              >
+                
+                <span>{parseFloat(entry.balance).toFixed(6)}</span>
+                <div className='flex flex-row'>
+                <img
+                  src={getCryptoIcon(entry.cryptoname)}
+                  alt={entry.cryptoname}
+                  className="w-6 h-6 mr-2"
+                />
+                <span>{entry.cryptoname}</span>
+                </div>
+               
+              </li>
               ))}
               </span>
             </ul>
