@@ -3,6 +3,7 @@ import axios from "axios";
 import { BASE_URL } from "../constants/config";
 import Carousel from "./Carousel";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import "./UserDashboard.css"
 const Games = () => {
     const [games, setGames] = useState([]);
     const [formData, setFormData] = useState({
@@ -154,7 +155,7 @@ const Games = () => {
     }, []);
 
     return (
-        <div className="h-full bg-white" >{/* style={{ backgroundColor: "rgba(21,49,32,255)" }} */}
+        <div className="h-full no-scrollbar bg-white  " >{/* style={{ backgroundColor: "rgba(21,49,32,255)" }} */}
             {games.length > 0 && !showForm && (
                 <div className="block right-0 top-20 fixed">
                     <button
@@ -289,7 +290,7 @@ const Games = () => {
                 {!editing && !showForm && (
                     <div>
                         {games && games.length > 0 ? (
-                            <div className="overflow-x-auto">
+                            <div className="overflow-x-auto no-scrollbar">
                                 <table className="table-auto w-full bg-gray-800 text-white border-collapse border border-gray-700 rounded-lg">
                                     <thead>
                                         <tr>

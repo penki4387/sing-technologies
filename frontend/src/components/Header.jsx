@@ -7,12 +7,14 @@ const Header = () => {
 
   const userToken = localStorage.getItem('usertoken');
   const adminToken = localStorage.getItem('admintoken');
+  const [wallet, setWallet] = useState([]);
   
-  const user = localStorage.getItem('user');
-  const fundingWallet = localStorage.getItem('fundingWallet');
-  const supportWallet = localStorage.getItem('supportWallet');
-  console.log(fundingWallet, "fundingWallet");
-  const visibleFundingWallet = fundingWallet ? (parseFloat(fundingWallet)).toFixed(6) : '0.00';
+ 
+ 
+  const [visibleFundingWallet,setVisibleFundingWallet] = useState(0.000000)
+  const [selectedCryptoname, setSelectedCryptoname] = useState('INR'); // Default currency
+
+  
 
 
   const getCryptoIcon = (symbol) => {
@@ -40,13 +42,23 @@ const Header = () => {
   const [selectedWallet, setSelectedWallet] = useState(null);
   const [hoverTimeout, setHoverTimeout] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false); // Add this state
-  const [wallet, setWallet] = useState([]);
+  
 
 useEffect(() => {
   const walletData = JSON.parse(localStorage.getItem('wallet')) || [];
   console.log("Wallet Data:", walletData);
   setWallet(walletData);
 }, []);
+
+useEffect(() => {
+  const selectedWallet = wallet.find(entry => entry.cryptoname === selectedCryptoname);
+  if (selectedWallet) {
+    setVisibleFundingWallet(`${parseFloat(selectedWallet.balance).toFixed(6)} ${selectedCryptoname}`);
+  } else {
+    setVisibleFundingWallet('0.000000 INR'); // Fallback if not found
+  }
+}, [selectedCryptoname, wallet]);
+
 
   const UserLoginPage = location.pathname === '/login' || location.pathname === '/register';
   const UserDashboardPage = location.pathname === '/';
@@ -93,7 +105,7 @@ useEffect(() => {
 
             className="bg-gray-800 text-white py-2 px-8  hover:border-transparent rounded"
           >
-            {fundingWallet ? `${visibleFundingWallet || 0.000000} ▾` : '0.00'}
+            {`${visibleFundingWallet || 0.000000} ▾`}
           </button>
           {hovered && (
             <div className="flex flex-col absolute right-0 bg-white text-black w-full mt-5 rounded shadow-lg z-50 max-h-85">
@@ -103,6 +115,7 @@ useEffect(() => {
                 <li
                 key={index}
                 className="flex flex-row justify-between items-center p-2 hover:bg-gray-100 cursor-pointer"
+                onClick={() => setSelectedCryptoname(entry.cryptoname)}
               >
                 
                 <span>{parseFloat(entry.balance).toFixed(6)}</span>
@@ -112,7 +125,7 @@ useEffect(() => {
                   alt={entry.cryptoname}
                   className="w-6 h-6 mr-2"
                 />
-                <span>{entry.cryptoname}</span>
+                <span>{(entry.cryptoname)}</span>
                 </div>
                
               </li>

@@ -25,7 +25,7 @@ router.post('/register', async (req, res) => {
       const userId = results.insertId;
 
       // List of cryptocurrencies
-      const cryptocurrencies = ['BNB', 'USDC', 'APE', 'BUSD', 'CRO', 'DAI', 'LINK', 'SAND', 'SHIB', 'UNI', 'INR','CP'];
+      const cryptocurrencies = ['BTC', 'ETH', 'LTC', 'USDT', 'SOL', 'DOGE', 'BCH', 'XRP', 'TRX', 'EOS', 'INR','CP'];
 
       // Generate wallet entries for the new user
       const walletQuery = "INSERT INTO wallet (userId, balance, cryptoname) VALUES ?";

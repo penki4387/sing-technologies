@@ -27,15 +27,45 @@ router.post('/admin-login', async (req, res) => {
 // Create a new user
 router.post('/user', async (req, res) => {
   const { username, email, password, phone, dob } = req.body;
+  const referalCode = "admin"
+  console.log(req.body,"req.body");
+
   try {
-    const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
-    const query = "INSERT INTO users (username, email, password, phone, dob) VALUES (?, ?, ?, ?, ?)";
-    connection.query(query, [username, email, hashedPassword, phone, dob], (err, results) => {
-      if (err) return res.status(500).json({ error: 'Database error' });
-      res.status(201).json({ message: 'User created successfully', id: results.insertId });
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Insert the user into the 'users' table
+    const query = "INSERT INTO users (username, email, password, phone, dob, code) VALUES (?, ?, ?, ?, ?, ?)";
+    connection.query(query, [username, email, hashedPassword, phone, dob, referalCode], (err, results) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json({ error: 'Database error' });
+      }
+
+      // Get the newly created user's ID
+      const userId = results.insertId;
+
+      // List of cryptocurrencies
+      const cryptocurrencies = ['BTC', 'ETH', 'LTC', 'USDT', 'SOL', 'DOGE', 'BCH', 'XRP', 'TRX', 'EOS', 'INR','CP'];
+
+      // Generate wallet entries for the new user
+      const walletQuery = "INSERT INTO wallet (userId, balance, cryptoname) VALUES ?";
+      const walletValues = cryptocurrencies.map(crypto => [userId, 0, crypto]);
+
+      // Insert wallet entries into the 'wallet' table
+      connection.query(walletQuery, [walletValues], (err, walletResults) => {
+        if (err) {
+          console.log(err);
+          return res.status(500).json({ error: 'Error creating wallet entries' });
+        }
+
+        // Respond with a success message
+        res.status(201).json({ message: 'User registered and wallet initialized successfully' });
+      });
     });
   } catch (error) {
-    res.status(500).json({ error: 'Error creating user' });
+    console.log(error);
+    res.status(500).json({ error: 'Error registering user' });
   }
 });
 

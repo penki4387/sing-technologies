@@ -58,6 +58,7 @@ const Users = () => {
 
   // Handle new user addition
   const handleAddUser = async (newUser) => {
+    console.log(newUser,"newUser")
     try {
       const response = await axios.post('http://localhost:5000/api/admin/user', newUser);
       setUsers([...users, { ...newUser, id: response.data.id }]);
