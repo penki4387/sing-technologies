@@ -109,14 +109,17 @@ router.get('/allusers', async (req, res) => {
   }
 });
 
-//Get one user by name
-router.get('/user/:name', async (req, res) => {
-  const name = req.params.name;
+//Get one user by id
+router.get('/user/:id', async (req, res) => {
+  const userId = req.params.id;
+  console.log(userId, "name");
+  const username ="Vikram Singh"
   try {
-    const query = "SELECT * FROM users WHERE username = ?";
-    connection.query(query, [name], (err, results) => {
+    const query = "SELECT * FROM users WHERE id = ? ";
+    connection.query(query, [userId], (err, results) => {
       if (err) return res.status(500).json({ error: 'Database query error' });
       if (results.length === 0) return res.status(404).json({ error: 'User not found' });
+      
       res.json(results[0]);
     });
   } catch (error) {
@@ -178,19 +181,60 @@ router.delete('/user/:id', async (req, res) => {
 });
 
 
-// Update user by ID
+// Update user details by ID
 router.put('/user/:id', async (req, res) => {
   const userId = req.params.id;
   const { username, email, phone, dob } = req.body;
+
   try {
     const query = "UPDATE users SET username = ?, email = ?, phone = ?, dob = ? WHERE id = ?";
     connection.query(query, [username, email, phone, dob, userId], (err, results) => {
       if (err) return res.status(500).json({ error: 'Database query error' });
       if (results.affectedRows === 0) return res.status(404).json({ error: 'User not found' });
-      res.json({ message: 'User updated successfully' });
+      console.log("User details updated successfully");
+      res.json({ message: 'User details updated successfully' });
     });
   } catch (error) {
-    res.status(500).json({ error: 'Error updating user' });
+    res.status(500).json({ error: 'Error updating user details' });
   }
 });
+
+// Update user password by ID
+router.put('/user/:id/password', async (req, res) => {
+  const userId = req.params.id;
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ error: 'Current and new passwords are required' });
+  }
+
+  try {
+    // Fetch the current hashed password
+    const querySelect = "SELECT password FROM users WHERE id = ?";
+    connection.query(querySelect, [userId], async (err, results) => {
+      if (err) return res.status(500).json({ error: 'Database query error' });
+      if (results.length === 0) return res.status(404).json({ error: 'User not found' });
+
+      const hashedPassword = results[0].password;
+
+      // Verify current password
+      const isPasswordValid = await bcrypt.compare(currentPassword, hashedPassword);
+      if (!isPasswordValid) return res.status(401).json({ error: 'Current password is incorrect' });
+
+      // Hash the new password
+      const newHashedPassword = await bcrypt.hash(newPassword, 10);
+
+      // Update the password in the database
+      const queryUpdate = "UPDATE users SET password = ? WHERE id = ?";
+      connection.query(queryUpdate, [newHashedPassword, userId], (err, updateResults) => {
+        if (err) return res.status(500).json({ error: 'Database query error' });
+        console.log("password updated successfully");
+        res.json({ message: 'Password updated successfully' });
+      });
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Error updating password' });
+  }
+});
+
 module.exports = router;

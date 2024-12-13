@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import "./UserDashboard.css";
 import {BASE_URL} from "../constants/config";
+import { GET_ALL_GAMES } from '../constants/apiEndpoints';
 
 const UserDashboard = () => {
   const user = localStorage.getItem('username') || "VikramSah291";
@@ -16,7 +17,7 @@ const UserDashboard = () => {
 
   const fetchGames = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/games/allgames');
+      const response = await axios.get(GET_ALL_GAMES);
       console.log(response.data, "response");
       setGames(response.data);
     } catch (err) {
@@ -113,7 +114,9 @@ const UserDashboard = () => {
             style={{ scrollBehavior: "smooth", width: "100%" }}
             id="gamesContainer"
           >
-            {games.map((game, index) => (
+            {/* I just want to show the games which have type as Casino */}
+
+            {games.filter((game) => game.type === "Casino" && game.popularity === "Very Popular" || game.popularity === "Popular").map((game, index) => (
               <div
                 key={index}
                 className="min-w-[15%] relative rounded-lg overflow-hidden hover:scale-105 transition transform duration-300"
@@ -184,7 +187,7 @@ const UserDashboard = () => {
             style={{ scrollBehavior: "smooth", width: "100%" }}
             id="sportsContainer"
           >
-            {[
+            {/* {[
               { name: 'Soccer', image: './soccer.jpg', popularity: 'Popular' },
               { name: 'Tennis', image: './tennis.jpg', popularity: 'Popular' },
               { name: 'Basketball', image: './basketball.png', popularity: 'Popular' },
@@ -197,7 +200,10 @@ const UserDashboard = () => {
               { name: 'Handball', image: './Handball.jpg', popularity: 'Popular' },
               { name: 'Ice Hockey', image: './iceHockey.jpg', popularity: 'Popular' },
               { name: 'Rugby', image: './rugby.jpg', popularity: 'Popular' },
-            ].map((sport, index) => (
+            ]
+              */}
+              {
+           games.filter((game) => game.type === 'Sport').map((sport, index) => ( 
               <div
                 key={index}
                 className="min-w-[15%] relative rounded-lg overflow-hidden hover:scale-105 transition transform duration-300"

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserDashboard from "../components/UserDashboard";
 import BankAccountManager from "../components/BankAccountManager";
+import UserSettings from "../components/UserSettings";
 
 const Homepage = () => {
   const [activeComponent, setActiveComponent] = useState("dashboard");
@@ -33,7 +34,7 @@ const Homepage = () => {
           case "profileTypeB":
             return <BankAccountManager/>;
           case "profileTypeC":
-            return <div>Settings</div>;
+            return <UserSettings/>;
           default:
             return <div>Select a profile item to view details.</div>;
         }
@@ -207,7 +208,7 @@ const Homepage = () => {
 
       {/* Main Content */}
       <main
-        className="flex-1 p-6 ml-[20%] overflow-y-auto mt-20"
+        className="flex-1 p-6 ml-[20%] overflow-y-auto mt-20 "
         style={{ backgroundColor: "rgba(21,49,32,255)" }}
       >
         {renderComponent()}

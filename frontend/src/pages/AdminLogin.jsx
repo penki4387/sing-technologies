@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import PasswordInput from '../components/PasswordInput';
+import { ADMIN_LOGIN } from '../constants/apiEndpoints';
 
 const AdminLogin = () => {
   const [username, setUsername] = useState('');
@@ -35,7 +36,7 @@ const AdminLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/admin/admin-login', {
+      const response = await axios.post(ADMIN_LOGIN, {
         username,
         password,
       });

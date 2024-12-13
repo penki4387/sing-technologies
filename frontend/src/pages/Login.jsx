@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+import { USER_LOGIN } from '../constants/apiEndpoints';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -19,7 +20,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/user/login', {
+      const response = await axios.post(USER_LOGIN, {
         email,
         password,
       });
@@ -41,6 +42,7 @@ const Login = () => {
       localStorage.setItem('email', user.email);
       localStorage.setItem('fundingWallet', user.fundingWallet);
       localStorage.setItem('supportWallet', user.supportWallet);
+      localStorage.setItem('userId', user.id);
 
       // Store wallet data in localStorage
       localStorage.setItem('wallet', JSON.stringify(wallet));

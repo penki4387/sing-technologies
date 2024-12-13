@@ -57,10 +57,12 @@ const BankAccountManager = () => {
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">Bank Account Manager</h1>
+    <div className=" mx-auto p-6 h-screen" style={{ backgroundColor: "rgba(21,49,32,255)" }}>
+      <h1 className="text-2xl font-bold mb-4 text-white text-center">Bank Account Manager</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-4 bg-gray-100 p-4 rounded">
+      <div className=" flex  font-bold mb-4  justify-center">
+
+      <form onSubmit={handleSubmit} className=" flex flex-col space-y-4 bg-gray-100 p-4 rounded w-1/2 ">
         <div>
           <label className="block mb-1 font-medium">Account Holder's Name</label>
           <input
@@ -128,6 +130,9 @@ const BankAccountManager = () => {
           {editIndex !== null ? "Update Account" : "Add Account"}
         </button>
       </form>
+      </div>
+
+      
 
       <div className="mt-6">
         <h2 className="text-xl font-bold mb-4">Accounts List</h2>

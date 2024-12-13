@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import PasswordInput from '../components/PasswordInput';
+import { REGISTER_USER } from '../constants/apiEndpoints';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -15,7 +16,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-     const reponse = await axios.post('http://localhost:5000/api/user/register', {
+     const reponse = await axios.post(REGISTER_USER, {
         name,
         email,
         password,

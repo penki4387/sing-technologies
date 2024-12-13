@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { BASE_URL } from "../constants/config";
+import { BASE_URL, } from "../constants/config";
+import {GET_ALL_GAMES, ADD_GAME, UPDATE_GAME, DELETE_GAME} from "../constants/apiEndpoints";
 import Carousel from "./Carousel";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import "./UserDashboard.css"
@@ -28,7 +29,7 @@ const Games = () => {
 
     const fetchGames = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/games/allgames');
+            const response = await axios.get(GET_ALL_GAMES);
             if (response.data && response.data.length > 0) {
                 setGames(response.data);
             } else {
@@ -58,17 +59,7 @@ const Games = () => {
         setCanScrollRight(container.scrollLeft < container.scrollWidth - container.clientWidth);
     };
 
-    // const scrollGames = (direction) => {
-    //     const container = document.getElementById("gamesContainer");
-    //     const scrollAmount = 200;
-    //     if (direction === "left") container.scrollLeft -= scrollAmount;
-    //     else container.scrollLeft += scrollAmount;
-    //     updateScrollButtons("gamesContainer");
-    // };
-
-    // useEffect(() => {
-    //     updateScrollButtons("gamesContainer");
-    // }, [games]);
+    
 
     const handleInputChange = (e) => {
         const { name, value, files } = e.target;
@@ -91,12 +82,12 @@ const Games = () => {
 
         try {
             if (editing) {
-                await axios.put(`${BASE_URL}/api/games/updategame/${formData.id}`, data, {
+                await axios.put(`${UPDATE_GAME(formData.id)}`, data, {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
                 alert("Game updated successfully");
             } else {
-                await axios.post(`${BASE_URL}/api/games/addgame`, data, {
+                await axios.post(ADD_GAME, data, {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
                 alert("Game created successfully");
@@ -127,7 +118,7 @@ const Games = () => {
     const handleDelete = async (id) => {
         if (window.confirm("Are you sure you want to delete this game?")) {
             try {
-                await axios.delete(`${BASE_URL}/api/games/deletegame/${id}`);
+                await axios.delete(DELETE_GAME(id));
                 alert("Game deleted successfully");
                 fetchGames();
             } catch (error) {
@@ -213,18 +204,24 @@ const Games = () => {
                             required
                         />
                     </div>
+
+                    {/* I want type of be Select with two options "Casino" and "Sport" */}
                     <div className="mb-4">
-                        <label className="block text-black font-medium mb-2">Type</label>
-                        <input
-                            type="text"
+                        <label className="block text-gray-700 font-medium mb-2">Type</label>
+                        <select
                             name="type"
                             value={formData?.type}
                             onChange={handleInputChange}
-                            placeholder={formData.type}
                             className="w-full p-3 text-black border rounded-lg focus:outline-none focus:ring focus:ring-green-300"
+                            placeholder={formData.type}
                             required
-                        />
+                        >
+                            <option value="Casino">Casino</option>
+                            <option value="Sport">Sport</option>
+                        </select>   
+            
                     </div>
+                    
 
 
                     {/* Description Field */}

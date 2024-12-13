@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import PasswordInput from '../components/PasswordInput';
 import "./UserDashboard.css"
+import { ADD_USER_BY_ADMIN, DELETE_USER, GET_ALL_USERS, UPDATE_USER } from '../constants/apiEndpoints';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -14,7 +15,7 @@ const Users = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/user/allusers');
+        const response = await axios.get(GET_ALL_USERS);
         setUsers(response.data);
       } catch (err) {
         setError('Failed to load users.');
@@ -29,7 +30,7 @@ const Users = () => {
   // Handle delete user
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/user/user/${id}`);
+      await axios.delete(DELETE_USER(id));
       alert('User deleted successfully.');
       setUsers(users.filter(user => user.id !== id));
     } catch (err) {
@@ -41,7 +42,7 @@ const Users = () => {
   const handleSave = async (id) => {
     try {
       const updatedUser = users.find(user => user.id === id);
-      await axios.put(`http://localhost:5000/api/user/user/${id}`, updatedUser);
+      await axios.put(UPDATE_USER(id), updatedUser);
       alert('User updated successfully.');
       setEditingUser(null);
     } catch (err) {
@@ -60,7 +61,7 @@ const Users = () => {
   const handleAddUser = async (newUser) => {
     console.log(newUser,"newUser")
     try {
-      const response = await axios.post('http://localhost:5000/api/admin/user', newUser);
+      const response = await axios.post(ADD_USER_BY_ADMIN, newUser);
       setUsers([...users, { ...newUser, id: response.data.id }]);
       setShowForm(false);
       alert('User created successfully!');
