@@ -1,6 +1,7 @@
 import React, { useState,useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {FaCog } from 'react-icons/fa';
+import WalletModal from './WalletModal';
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -159,34 +160,10 @@ useEffect(() => {
       )}
 
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 w-full">
-          <div className="bg-white rounded-lg shadow-lg  w-11/20 flex flex-col h-[600px] text-white" style={{ backgroundColor: "rgba(21,49,32,255)" }}>
-            <h2 className="text-xl font-bold mb-4 text-white p-2 px-4 rounded shadow" style={{ backgroundColor: "rgba(41,69,52,255)" }} >Stack</h2>
-            <p className="text-sm mb-6 text-white p-2 rounded shadow" style={{ backgroundColor: "rgba(21,49,32,255)" }}>Stack is a decentralized
-              Please check your email & click the verification link to activate your account.
-            </p>
-            <div className="flex flex-col space-y-4 p-6">
-              <div className="flex justify-between items-center border p-2 rounded">
-                <span className="font-medium">Funding Wallet</span>
-                <span>{visibleFundingWallet} BTC</span>
-              </div>
-              <div className="flex justify-between items-center border p-2 rounded">
-                <span className="font-medium">Ethereum</span>
-                <span>{visibleFundingWallet} ETH</span>
-              </div>
-              <div className="flex justify-between items-center border p-2 rounded">
-                <span className="font-medium">Dogecoin</span>
-                <span>{visibleFundingWallet} DOGE</span>
-              </div>
-            </div>
-            <button
-              className="mt-auto w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-700"
-              onClick={toggleModal}
-            >
-              Close
-            </button>
-          </div>
-        </div>
+        <WalletModal
+        visibleFundingWallet={visibleFundingWallet}
+        toggleModal={toggleModal}
+      />
       )}
 
 

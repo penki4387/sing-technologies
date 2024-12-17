@@ -10,6 +10,11 @@ const Users = () => {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const options = [
+    { value:'verified', label: 'Verified' },
+    { value:'unverified', label: 'Unverified' },
+    {value:'rejected', label:'Rejected'}
+  ]
 
   // Fetch users from API
   useEffect(() => {
@@ -162,20 +167,23 @@ const Users = () => {
         <table className="w-full bg-white rounded-lg shadow-md overflow-hidden">
         <thead className="bg-blue-500 text-white">
           <tr>
-            <th className="px-4 py-2 text-left">#</th>
-            <th className="px-4 py-2 text-left">Name</th>
-            <th className="px-4 py-2 text-left">Email</th>
-            <th className="px-4 py-2 text-left">Actions</th>
+            
+            <th className="px-2 py-2 text-left text-sm">Name</th>
+            <th className="px-2 py-2 text-left text-sm">Email</th>
+            <th className="px-2 py-2 text-left text-sm">Aadhar</th>
+            <th className="px-2 py-2 text-left text-sm">PAN</th>
+            <th className="px-2 py-2 text-left text-sm">KYC Status</th>
+            <th className="px-2 py-2 text-left texts-sm">Actions</th>
           </tr>
         </thead>
-        <tbody className="text-black">
+        <tbody className="text-black text-sm">
           {users.map((user, index) => (
             <tr
               key={user.id}
               className={`${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}
             >
-              <td className="px-4 py-2">{index + 1}</td>
-              <td className="px-4 py-2">
+              
+              <td className="px-2 py-2">
                 {editingUser === user.id ? (
                   <input
                     type="text"
@@ -186,7 +194,7 @@ const Users = () => {
                   user.username
                 )}
               </td>
-              <td className="px-4 py-2">
+              <td className="px-2 py-2">
                 {editingUser === user.id ? (
                   <input
                     type="email"
@@ -197,24 +205,51 @@ const Users = () => {
                   user.email
                 )}
               </td>
-              <td className="px-4 py-2 flex gap-2">
+              <td className="px-2 py-2">
+                
+                  {user.aadhar}
+              
+              </td>
+              <td className="px-2 py-2">
+                
+                 { user.pan } 
+              
+              </td>
+              <td className="px-2 py-2">
+                {editingUser === user.id ? (
+                  //while editting it should show a dropdown of kyc status
+                  <select
+                    value={user.kycstatus}
+                    onChange={(e) => handleInputChange(user.id, 'kycstatus', parseInt(e.target.value))}
+                  >
+                    <option value="0">Not Verified</option>
+                    <option value="1">Verified</option>
+                    <option value="2">Rejected</option>
+                  </select>
+                ) : (
+                  user.kycstatus === 1 ? "Verified" : "Not Verified"
+                )}
+              </td>
+                    
+
+              <td className="px-2 py-2 flex gap-2">
                 {editingUser === user.id ? (
                   <button
-                    className="px-3 py-1 bg-green-500 text-white rounded"
+                    className="px-1 py-1 bg-green-500 text-white rounded"
                     onClick={() => handleSave(user.id)}
                   >
                     Save
                   </button>
                 ) : (
                   <button
-                    className="px-3 py-1 bg-blue-500 text-white rounded"
+                    className="px-1 py-1 bg-blue-500 text-white rounded"
                     onClick={() => setEditingUser(user.id)}
                   >
                     Edit
                   </button>
                 )}
                 <button
-                  className="px-3 py-1 bg-red-500 text-white rounded"
+                  className="px-1 py-1 bg-red-500 text-white rounded"
                   onClick={() => handleDelete(user.id)}
                 >
                   Delete
