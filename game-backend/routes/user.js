@@ -2,8 +2,22 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const connection = require('../config/db');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 const router = express.Router();
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage });
 
 // User registration
 router.post('/register', async (req, res) => {
@@ -236,5 +250,71 @@ router.put('/user/:id/password', async (req, res) => {
     res.status(500).json({ error: 'Error updating password' });
   }
 });
+
+
+
+// Special update route for aadhar, pan, and kycstatus
+router.put("/user/:id/kyc", upload.fields([
+  { name: "aadharImage", maxCount: 1 },
+  { name: "panImage", maxCount: 1 }
+]), async (req, res) => {
+  const userId = req.params.id;
+  const { kycstatus } = req.body;
+
+  // File paths for uploaded images
+  const aadhar = req.files["aadharImage"] ? req.files["aadharImage"][0].filename : null;
+  const pan = req.files["panImage"] ? req.files["panImage"][0].filename : null;
+
+  if (!kycstatus || (!aadhar && !pan)) {
+    return res.status(400).json({ error: "KYC status and at least one image are required" });
+  }
+
+  try {
+    // Prepare query and parameters
+    const fieldsToUpdate = [];
+    const values = [];
+
+    if (aadhar) {
+      fieldsToUpdate.push("aadhar = ?");
+      values.push(aadhar);
+    }
+    if (pan) {
+      fieldsToUpdate.push("pan = ?");
+      values.push(pan);
+    }
+
+    fieldsToUpdate.push("kycstatus = ?");
+    values.push(kycstatus);
+    values.push(userId);
+
+    const query = `
+      UPDATE users 
+      SET ${fieldsToUpdate.join(", ")}
+      WHERE id = ?
+    `;
+
+    connection.query(query, values, (err, results) => {
+      if (err) {
+        console.error("Database query error:", err);
+        return res.status(500).json({ error: "Database query error" });
+      }
+
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      res.json({
+        message: "KYC details updated successfully",
+        aadhar: aadhar || "No change",
+        pan: pan || "No change",
+        kycstatus,
+      });
+    });
+  } catch (error) {
+    console.error("Error updating KYC details:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 
 module.exports = router;

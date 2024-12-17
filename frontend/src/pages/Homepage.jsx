@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import UserDashboard from "../components/UserDashboard";
 import BankAccountManager from "../components/BankAccountManager";
 import UserSettings from "../components/UserSettings";
+import KYCManager from "../components/KYCManager";
 
 const Homepage = () => {
   const [activeComponent, setActiveComponent] = useState("dashboard");
@@ -30,7 +31,7 @@ const Homepage = () => {
       case "profile":
         switch (selectedProfileItem) {
           case "profileTypeA":
-            return <div>KYC Content</div>;
+            return <KYCManager/>;
           case "profileTypeB":
             return <BankAccountManager/>;
           case "profileTypeC":
@@ -208,7 +209,7 @@ const Homepage = () => {
 
       {/* Main Content */}
       <main
-        className="flex-1 p-6 ml-[20%] overflow-y-auto mt-20 "
+        className="flex-1 p-6 ml-[20%] overflow-y-auto mt-20 h-screen "
         style={{ backgroundColor: "rgba(21,49,32,255)" }}
       >
         {renderComponent()}
