@@ -187,21 +187,7 @@ const UserDashboard = () => {
             style={{ scrollBehavior: "smooth", width: "100%" }}
             id="sportsContainer"
           >
-            {/* {[
-              { name: 'Soccer', image: './soccer.jpg', popularity: 'Popular' },
-              { name: 'Tennis', image: './tennis.jpg', popularity: 'Popular' },
-              { name: 'Basketball', image: './basketball.png', popularity: 'Popular' },
-              { name: 'Cricket', image: './cricket.jpg', popularity: 'Popular' },
-              { name: 'Racing', image: './racing.jpg', popularity: 'Popular' },
-              { name: 'American Football', image: './americanFootball.jpg', popularity: 'Popular' },
-              { name: 'Baseball', image: './baseball.jpg', popularity: 'Popular' },
-              { name: 'Golf', image: './golf.jpg', popularity: 'Popular' },
-              { name: 'Volleyball', image: './volleyball.jpg', popularity: 'Popular' },
-              { name: 'Handball', image: './Handball.jpg', popularity: 'Popular' },
-              { name: 'Ice Hockey', image: './iceHockey.jpg', popularity: 'Popular' },
-              { name: 'Rugby', image: './rugby.jpg', popularity: 'Popular' },
-            ]
-              */}
+            
               {
            games.filter((game) => game.type === 'Sport').map((sport, index) => ( 
               <div

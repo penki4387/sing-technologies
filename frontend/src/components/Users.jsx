@@ -3,6 +3,7 @@ import axios from 'axios';
 import PasswordInput from '../components/PasswordInput';
 import "./UserDashboard.css"
 import { ADD_USER_BY_ADMIN, DELETE_USER, GET_ALL_USERS, UPDATE_USER } from '../constants/apiEndpoints';
+import { BASE_URL } from '../constants/config';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -31,6 +32,8 @@ const Users = () => {
 
     fetchUsers();
   }, []);
+
+  console.log(users,"users")
 
   // Handle delete user
   const handleDelete = async (id) => {
@@ -207,12 +210,12 @@ const Users = () => {
               </td>
               <td className="px-2 py-2">
                 
-                  {user.aadhar}
+                  <img src={`${BASE_URL}/uploads/${user.aadhar}g`} alt="Aadhar" className="w-8 h-8 rounded-full" />
               
               </td>
               <td className="px-2 py-2">
                 
-                 { user.pan } 
+                  <img src={`${BASE_URL}/uploads/${user.pan}.png`} alt="PAN" className="w-8 h-8 rounded-full" />
               
               </td>
               <td className="px-2 py-2">

@@ -1,34 +1,61 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const WalletModal = ({ visibleFundingWallet, toggleModal }) => {
   const [activeTab, setActiveTab] = useState('deposit'); // 'deposit' or 'withdrawal'
   const [inputValue, setInputValue] = useState(''); // Input field state
+  const [cryptoname, setCryptoname] = useState('BTC'); // Cryptoname selection
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState(''); // Success/Error message
 
-  // Dummy API Call
+  // API Call Function
   const handleApiCall = async (action) => {
-    setLoading(true);
-    try {
-      const response = await fetch(`https://dummyapi.io/wallet/${action}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: inputValue }),
-      });
-      const result = await response.json();
-      console.log(`${action} success:`, result);
-      alert(`${action.charAt(0).toUpperCase() + action.slice(1)} Successful!`);
-    } catch (error) {
-      console.error(`${action} error:`, error);
-      alert(`Failed to ${action}.`);
-    }
-    setLoading(false);
-  };
+    if (!inputValue) return alert("Please enter a valid amount!");
 
+    setLoading(true);
+    setMessage('');
+    const endpoint =
+      action === 'withdrawal'
+        ? 'http://localhost:5000/api/wallet/withdrawl' // Your withdrawal API endpoint
+        : 'http://localhost:5000/deposit'; // Replace with the deposit API endpoint
+
+    try {
+      const payload = {
+        userId: 1, // Replace with actual user ID
+        balance: inputValue,
+        cryptoname: cryptoname,
+        status: 0, // Default status for withdrawal
+      };
+
+      const response = await axios.post(endpoint, payload);
+      console.log(`${action} success:`, response.data);
+      setMessage(`${action.charAt(0).toUpperCase() + action.slice(1)} Successful!`);
+      setInputValue('');
+    } catch (error) {
+      console.error(`${action} error:`, error.response?.data || error.message);
+      setMessage(`Failed to ${action}.`);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+const options = [
+  {value:"BTC",label:"BTC"},
+  {value:"ETH",label:"ETH"},
+  {value:"LTC",label:"LTC"},
+  {value:"USDT",label:"USDT"},
+  {value:"SOL",label:"SOL"},
+  {value:"DOGE",label:"DOGE"},
+  {value:"BCH",label:"BCH"},
+  {value:"XRP",label:"XRP"},
+  {value:"TRX",label:"TRX"},
+  {value:"EOS",label:"EOS"},
+  {value:"INR",label:"INR"},
+  {value:"CP",label:"CP"},
+]
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 w-full">
-      <div
-        className="bg-white rounded-lg shadow-lg w-11/12 md:w-1/3 flex flex-col h-[400px] text-black"
-      >
+      <div className="bg-white rounded-lg shadow-lg w-11/12 md:w-1/3 flex flex-col h-[500px] text-black">
         {/* Buttons for Deposit and Withdrawal */}
         <div className="flex">
           <button
@@ -61,6 +88,22 @@ const WalletModal = ({ visibleFundingWallet, toggleModal }) => {
             {activeTab === 'deposit' ? 'Deposit Funds' : 'Withdraw Funds'}
           </h2>
 
+          {/* Cryptoname Selection */}
+          <div className="mb-4">
+            <label className="block mb-2 font-medium">Select Cryptocurrency</label>
+            <select
+              value={cryptoname}
+              onChange={(e) => setCryptoname(e.target.value)}
+              className="border p-2 rounded w-full"
+            >
+              {options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* Input Field */}
           <input
             type="number"
@@ -80,6 +123,21 @@ const WalletModal = ({ visibleFundingWallet, toggleModal }) => {
           >
             {loading ? 'Processing...' : `Confirm ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}`}
           </button>
+
+          {/* Message Display */}
+          {message && (
+            <p
+              className={`mt-4 text-center font-semibold ${
+                message.includes('Failed') ? 'text-red-500' : 'text-green-500'
+              }`}
+            >
+              {message}
+            </p>
+            
+
+
+            
+          )}
         </div>
 
         {/* Close Button */}

@@ -127,7 +127,6 @@ router.get('/allusers', async (req, res) => {
 router.get('/user/:id', async (req, res) => {
   const userId = req.params.id;
   console.log(userId, "name");
-  const username ="Vikram Singh"
   try {
     const query = "SELECT * FROM users WHERE id = ? ";
     connection.query(query, [userId], (err, results) => {

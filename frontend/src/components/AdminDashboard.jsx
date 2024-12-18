@@ -4,6 +4,8 @@ import Sidebar from './Sidebar';
 import { useNavigate } from 'react-router-dom';
 import Games from './Games';
 import "./UserDashboard.css"
+import AdminHome from './AdminHome';
+import WithdrawalApproval from './WithdrawApproval';
 
 const AdminDashboard = () => {
   const [activeComponent, setActiveComponent] = useState('dashboard');
@@ -19,8 +21,10 @@ const AdminDashboard = () => {
         return <div>Reports Page</div>;
       case 'games':
         return <Games/>;
+        case 'withdrawapproval':
+        return <WithdrawalApproval/>;
       default:
-        return <div>Welcome to the Admin Dashboard</div>;
+        return <AdminHome/>;
     }
   };
 
@@ -34,6 +38,18 @@ const AdminDashboard = () => {
       className="flex flex-col rounded-lg shadow-md p-2 mx-4 my-0 bg-gray-700"
       
       > {/*style={{ backgroundColor: `rgba(51, 79, 62, 255)` }} */}
+
+<li>
+          <button
+            onClick={() => setActiveComponent('dashboard')}
+            className= {hoverSidebarElement === "Dashboard" ? "w-full text-center py-3 px-6 bg-gray-600" : "w-full text-center py-3 px-6 bg-gray-700"}
+               
+                onMouseEnter={() => setHoverSidebarElement("Dashboard")}
+                onMouseLeave={() => setHoverSidebarElement(null)}
+          >
+            Dashboard
+          </button>
+        </li>
         <li>
           <button
             onClick={() => setActiveComponent('users')}
@@ -45,17 +61,19 @@ const AdminDashboard = () => {
             Users
           </button>
         </li>
+
         <li>
           <button
-            onClick={() => setActiveComponent('settings')}
-            className= {hoverSidebarElement === "Dashboard" ? "w-full text-center py-3 px-6 bg-gray-600" : "w-full text-center py-3 px-6 bg-gray-700"}
-               
-                onMouseEnter={() => setHoverSidebarElement("settings")}
+            onClick={() => setActiveComponent('withdrawapproval')}
+            className= {hoverSidebarElement === "withdrawapproval" ? "w-full text-center py-3 px-6 bg-gray-600" : "w-full text-center py-3 px-6 bg-gray-700"}
+                
+                onMouseEnter={() => setHoverSidebarElement("withdrawapproval")}
                 onMouseLeave={() => setHoverSidebarElement(null)}
           >
-            Settings
+            Withdraws
           </button>
         </li>
+        
         <li>
           <button
             onClick={() => setActiveComponent('reports')}
@@ -78,17 +96,19 @@ const AdminDashboard = () => {
             Games
           </button>
         </li>
+
         <li>
           <button
-            onClick={() => setActiveComponent('dashboard')}
+            onClick={() => setActiveComponent('settings')}
             className= {hoverSidebarElement === "Dashboard" ? "w-full text-center py-3 px-6 bg-gray-600" : "w-full text-center py-3 px-6 bg-gray-700"}
                
-                onMouseEnter={() => setHoverSidebarElement("Dashboard")}
+                onMouseEnter={() => setHoverSidebarElement("settings")}
                 onMouseLeave={() => setHoverSidebarElement(null)}
           >
-            Dashboard
+            Settings
           </button>
         </li>
+        
         
       </ul>
     </nav>
