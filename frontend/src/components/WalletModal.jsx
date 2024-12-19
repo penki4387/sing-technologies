@@ -7,6 +7,7 @@ const WalletModal = ({ visibleFundingWallet, toggleModal }) => {
   const [cryptoname, setCryptoname] = useState('BTC'); // Cryptoname selection
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(''); // Success/Error message
+  const userId = localStorage.getItem('userId');
 
   // API Call Function
   const handleApiCall = async (action) => {
@@ -17,17 +18,17 @@ const WalletModal = ({ visibleFundingWallet, toggleModal }) => {
     const endpoint =
       action === 'withdrawal'
         ? 'http://localhost:5000/api/wallet/withdrawl' // Your withdrawal API endpoint
-        : 'http://localhost:5000/deposit'; // Replace with the deposit API endpoint
+        : 'http://localhost:5000/api/user/wallet/balance'; // Replace with the deposit API endpoint
 
     try {
       const payload = {
-        userId: 1, // Replace with actual user ID
+        userId: userId, // Replace with actual user ID
         balance: inputValue,
         cryptoname: cryptoname,
         status: 0, // Default status for withdrawal
       };
 
-      const response = await axios.post(endpoint, payload);
+      const response = action === 'withdrawal' ? await axios.post(endpoint, payload) : await axios.put(endpoint, payload);
       console.log(`${action} success:`, response.data);
       setMessage(`${action.charAt(0).toUpperCase() + action.slice(1)} Successful!`);
       setInputValue('');

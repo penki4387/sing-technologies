@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import "./UserDashboard.css";
 
 const BankAccountManager = () => {
   const [accounts, setAccounts] = useState([]);
@@ -103,7 +104,7 @@ const BankAccountManager = () => {
   };
 
   return (
-    <div className="mx-auto p-6 h-screen" style={{ backgroundColor: "rgba(21,49,32,255)" }}>
+    <div className="mx-auto p-6 h-screen no-scrollbar " style={{ backgroundColor: "rgba(21,49,32,255)" }}>
       <h1 className="text-2xl font-bold mb-4 text-white text-center">Bank Account Manager</h1>
       <div className="flex font-bold mb-4 justify-center">
         <form onSubmit={handleSubmit} className="flex flex-col space-y-4 bg-gray-100 p-4 rounded w-1/2">
@@ -173,7 +174,7 @@ const BankAccountManager = () => {
       <div className="mt-6">
         <h2 className="text-xl font-bold mb-4 text-white text-center">Accounts List</h2>
         {accounts.length > 0 ? (
-          <table className="w-full border-collapse border border-gray-300">
+          <table className="w-full border-collapse border border-gray-300 text-white">
             <thead>
               <tr>
                 <th className="border border-gray-300 p-2">#</th>

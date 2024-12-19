@@ -4,7 +4,7 @@ import UserDashboard from "../components/UserDashboard";
 import BankAccountManager from "../components/BankAccountManager";
 import UserSettings from "../components/UserSettings";
 import KYCManager from "../components/KYCManager";
-
+import "../components/UserDashboard.css";
 const Homepage = () => {
   const [activeComponent, setActiveComponent] = useState("dashboard");
   const [selectedGame, setSelectedGame] = useState(null);
@@ -47,7 +47,7 @@ const Homepage = () => {
   };
 
   return (
-    <div className="flex h-100" style={{ backgroundColor: "rgba(21, 49, 32, 255)" }}>
+    <div className="flex h-100 no-scrollbar" style={{ backgroundColor: "rgba(21, 49, 32, 255)" }}>
       {/* Sidebar */}
       <aside
         className="w-[20%] text-white flex flex-col h-screen fixed top-20 left-0"
@@ -209,7 +209,7 @@ const Homepage = () => {
 
       {/* Main Content */}
       <main
-        className="flex-1 p-6 ml-[20%] overflow-y-auto mt-20 h-screen "
+        className="flex-1 p-6 ml-[20%] overflow-y-auto mt-20 h-screen no-scrollbar"
         style={{ backgroundColor: "rgba(21,49,32,255)" }}
       >
         {renderComponent()}

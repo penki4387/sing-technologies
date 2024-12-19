@@ -1,9 +1,10 @@
 import React from 'react';
 import Header from '../components/Header';
+import "../components/UserDashboard.css";
 
 const Layout = ({ children }) => {
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen no-scrollbar">
       <Header />
       <main className="flex-1">{children}</main>
       {/* Footer */}

@@ -53,7 +53,7 @@ const AdminDashboard = () => {
         <li>
           <button
             onClick={() => setActiveComponent('users')}
-            className= {hoverSidebarElement === "Dashboard" ? "w-full text-center py-3 px-6 bg-gray-600" : "w-full text-center py-3 px-6 bg-gray-700"}
+            className= {hoverSidebarElement === "users" ? "w-full text-center py-3 px-6 bg-gray-600" : "w-full text-center py-3 px-6 bg-gray-700"}
                 
                 onMouseEnter={() => setHoverSidebarElement("users")}
                 onMouseLeave={() => setHoverSidebarElement(null)}
@@ -77,7 +77,7 @@ const AdminDashboard = () => {
         <li>
           <button
             onClick={() => setActiveComponent('reports')}
-            className= {hoverSidebarElement === "Dashboard" ? "w-full text-center py-3 px-6 bg-gray-600" : "w-full text-center py-3 px-6 bg-gray-700"}
+            className= {hoverSidebarElement === "reports" ? "w-full text-center py-3 px-6 bg-gray-600" : "w-full text-center py-3 px-6 bg-gray-700"}
                 
                 onMouseEnter={() => setHoverSidebarElement("reports")}
                 onMouseLeave={() => setHoverSidebarElement(null)}
@@ -88,7 +88,7 @@ const AdminDashboard = () => {
         <li>
           <button
             onClick={() => setActiveComponent('games')}
-            className= {hoverSidebarElement === "Dashboard" ? "w-full text-center py-3 px-6 bg-gray-600" : "w-full text-center py-3 px-6 bg-gray-700"}
+            className= {hoverSidebarElement === "games" ? "w-full text-center py-3 px-6 bg-gray-600" : "w-full text-center py-3 px-6 bg-gray-700"}
            
             onMouseEnter={() => setHoverSidebarElement("games")}
                 onMouseLeave={() => setHoverSidebarElement(null)}
@@ -100,7 +100,7 @@ const AdminDashboard = () => {
         <li>
           <button
             onClick={() => setActiveComponent('settings')}
-            className= {hoverSidebarElement === "Dashboard" ? "w-full text-center py-3 px-6 bg-gray-600" : "w-full text-center py-3 px-6 bg-gray-700"}
+            className= {hoverSidebarElement === "settings" ? "w-full text-center py-3 px-6 bg-gray-600" : "w-full text-center py-3 px-6 bg-gray-700"}
                
                 onMouseEnter={() => setHoverSidebarElement("settings")}
                 onMouseLeave={() => setHoverSidebarElement(null)}

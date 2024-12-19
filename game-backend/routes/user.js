@@ -316,4 +316,45 @@ router.put("/user/:id/kyc", upload.fields([
 });
 
 
+// Update balance for a specific cryptoname and userId
+router.put('/wallet/balance', async (req, res) => {
+  const { userId, cryptoname, balance } = req.body;
+
+  // Input validation
+  if (!userId || !cryptoname || balance === undefined) {
+    return res.status(400).json({ error: 'userId, cryptoname, and balance are required fields.' });
+  }
+
+  try {
+    const query = `
+      UPDATE wallet
+      SET balance = ?
+      WHERE userId = ? AND cryptoname = ?
+    `;
+
+    connection.query(query, [balance, userId, cryptoname], (err, results) => {
+      if (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({ error: 'Database query error' });
+      }
+
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ error: 'Wallet entry not found for the specified userId and cryptoname.' });
+      }
+
+      res.json({
+        message: 'Wallet balance updated successfully',
+        userId,
+        cryptoname,
+        balance,
+      });
+    });
+  } catch (error) {
+    console.error('Error updating wallet balance:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
 module.exports = router;

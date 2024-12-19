@@ -20,7 +20,7 @@ const Games = () => {
     const [canScrollLeft, setCanScrollLeft] = useState(false);
     const [canScrollRight, setCanScrollRight] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
-    const gamesPerPage = 8; // Number of games per page
+    const gamesPerPage = 10; // Number of games per page
     const indexOfLastGame = currentPage * gamesPerPage;
     const indexOfFirstGame = indexOfLastGame - gamesPerPage;
     const currentGames = games.slice(indexOfFirstGame, indexOfLastGame);
@@ -146,7 +146,7 @@ const Games = () => {
     }, []);
 
     return (
-        <div className="h-full no-scrollbar bg-white  " >{/* style={{ backgroundColor: "rgba(21,49,32,255)" }} */}
+        <div className="h-full no-scrollbar bg-gray-200 rounded-lg shadow-md" >{/* style={{ backgroundColor: "rgba(21,49,32,255)" }} */}
             {games.length > 0 && !showForm && (
                 <div className="block right-0 top-20 fixed">
                     <button
@@ -157,7 +157,7 @@ const Games = () => {
                     </button>
                 </div>
             )}
-            <h1 className="text-2xl font-bold text-black mb-10 flex justify-center items-center">
+            <h1 className="text-2xl font-bold text-black my-4 flex justify-center items-center">
                 Games Management
             </h1>
 
@@ -283,7 +283,7 @@ const Games = () => {
             )}
 
             {/* Game List Section */}
-            <div className="flex justify-center mt-5">
+            <div className="flex justify-center w-full mt-5">
                 {!editing && !showForm && (
                     <div>
                         {games && games.length > 0 ? (
@@ -306,7 +306,7 @@ const Games = () => {
                                                     <img
                                                         src={game.image.startsWith('./') ? game.image : `${BASE_URL}/uploads/${game.image}`}
                                                         alt={game.name}
-                                                        className="w-16 h-16 object-cover rounded-lg"
+                                                        className="w-12 h-12 object-cover rounded-lg"
                                                     />
                                                 </td>
 
@@ -347,21 +347,21 @@ const Games = () => {
                                 </table>
 
                                 {/* Pagination Buttons */}
-                                <div className="flex justify-center mt-4 gap-4">
+                                <div className="flex justify-center mt-2 gap-4 mb-2">
                                     <button
                                         onClick={handlePreviousPage}
                                         disabled={currentPage === 1}
-                                        className={`px-4 py-2 rounded-lg ${currentPage === 1 ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
+                                        className={`px-2 py-1 rounded-lg ${currentPage === 1 ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
                                     >
                                         Previous
                                     </button>
-                                    <span className="text-white">
+                                    <span className="mt-1">
                                         Page {currentPage} of {totalPages}
                                     </span>
                                     <button
                                         onClick={handleNextPage}
                                         disabled={currentPage === totalPages}
-                                        className={`px-4 py-2 rounded-lg ${currentPage === totalPages ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
+                                        className={`px-2 py-1 rounded-lg ${currentPage === totalPages ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
                                     >
                                         Next
                                     </button>

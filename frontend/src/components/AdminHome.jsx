@@ -1,6 +1,7 @@
 import { useEffect,useState } from "react";
 import axios from "axios";
 import { GET_ALL_USERS, GET_ALL_GAMES } from "../constants/apiEndpoints";
+import AdminBankAccountslist from "./AdminBankAccountslist";
 const AdminHome = () => {
 
     const [users,setUsers] = useState([]);
@@ -150,68 +151,7 @@ const AdminHome = () => {
 
                     </div >
                 </div >
-                <div className="w-1/2">
-                    {/* Card 2: $75k Weekly Raffle */}
-                    < div className="bg-gray-800 flex-1 rounded-lg p-4 flex flex-col justify-between" >
-                        {/* Card Header */}
-
-
-                        {/* Center Content */}
-                        <div className="flex justify-between items-center mt-2">
-                            {/* Circular Progress */}
-
-                            <div>
-                                <h3 className="text-white text-lg font-semibold">$75k Weekly Raffle</h3>
-                                <p className="text-gray-400 text-sm mt-1">Finish your week with a win!</p>
-                                <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mt-10">
-                                    0 Tickets
-                                </button>
-                            </div>
-
-
-                            {/* Button */}
-
-                            <div className="relative w-40 h-40">
-                                <svg className="w-full h-full" viewBox="0 0 36 36">
-                                    <circle
-                                        className="text-gray-600"
-                                        strokeWidth="3"
-                                        stroke="currentColor"
-                                        fill="transparent"
-                                        r="15"
-                                        cx="18"
-                                        cy="18"
-                                    />
-                                    <circle
-                                        className="text-blue-500"
-                                        strokeWidth="3"
-                                        stroke="currentColor"
-                                        fill="transparent"
-                                        r="15"
-                                        cx="18"
-                                        cy="18"
-                                        style={{ strokeDasharray: "94", strokeDashoffset: "50" }} // Adjust progress dynamically
-                                    />
-                                </svg>
-                                <p className="absolute inset-0 flex items-center justify-center text-white text-md">
-                                    Ends in<br />4d 8h
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Footer */}
-                        <div className="mt-4">
-                            <div className="w-full bg-gray-700 h-2 rounded-full">
-                                <div
-                                    className="bg-blue-500 h-2 rounded-full"
-                                    style={{ width: "0%" }} // Adjust dynamically
-                                ></div>
-                            </div>
-                            <p className="text-gray-400 text-right text-sm mt-1">0%</p>
-                        </div>
-
-                    </div >
-                </div>
+                <AdminBankAccountslist/>
                </div>
 
 </div>
