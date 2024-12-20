@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./UserDashboard.css";
+import { ADD_BANK_ACCOUNT, GET_ALL_BANK_ACCOUNTS, UPDATE_BANK_ACCOUNT, GET_BANK_ACCOUNTS_BY_USER_ID, DELETE_BANK_ACCOUNT } from "../constants/apiEndpoints";
 
 const BankAccountManager = () => {
   const [accounts, setAccounts] = useState([]);
@@ -22,7 +23,7 @@ const BankAccountManager = () => {
 
   const fetchAccounts = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/bankaccount/getone/user/${userId}`); 
+      const response = await axios.get(GET_BANK_ACCOUNTS_BY_USER_ID(userId)); 
       console.log(response.data);
       setAccounts(response.data);
     } catch (error) {
@@ -46,7 +47,7 @@ const BankAccountManager = () => {
     try {
       if (editId) {
         // Update existing account
-        const response = await axios.put(`http://localhost:5000/api/bankaccount/update/${editId}`, {
+        const response = await axios.put(UPDATE_BANK_ACCOUNT(editId), {
           accountname: formData.accountname,
           accountnumber: formData.accountnumber,
           ifsccode: formData.ifsccode,
@@ -56,7 +57,7 @@ const BankAccountManager = () => {
         
       } else {
         // Create new account
-        const response = await axios.post("http://localhost:5000/api/bankaccount/addnew", {
+        const response = await axios.post(ADD_BANK_ACCOUNT, {
           userId: userId, // Replace with actual user ID
           accountname: formData.accountname,
           accountnumber: formData.accountnumber,
@@ -95,7 +96,7 @@ const BankAccountManager = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this account?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/bankaccount/update/${id}`);
+        await axios.delete(DELETE_BANK_ACCOUNT(id));
         fetchAccounts();
       } catch (error) {
         console.error("Error deleting account:", error);

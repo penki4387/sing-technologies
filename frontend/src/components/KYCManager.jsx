@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../constants/config"; // Adjust as per your project
+import { GET_KYC_DETAILS_BY_USER_ID, UPDATE_KYC_STATUS } from "../constants/apiEndpoints";
 
 const KYCManager = () => {
   const userId = localStorage.getItem("userId");
@@ -19,7 +20,7 @@ const KYCManager = () => {
 
   const fetchKYCDetails = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/user/user/${userId}`);
+      const response = await axios.get(GET_KYC_DETAILS_BY_USER_ID(userId));
       const { kycstatus, aadharImage, panImage } = response.data;
       setKYCDetails({
         kycstatus: kycstatus || 0,
@@ -54,7 +55,7 @@ const KYCManager = () => {
       formData.append("panImage", kycDetails.panImage);
 
     try {
-      await axios.put(`${BASE_URL}/api/user/user/${userId}/kyc`, formData, {
+      await axios.put(UPDATE_KYC_STATUS(userId), formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setMessage("KYC details updated successfully.");

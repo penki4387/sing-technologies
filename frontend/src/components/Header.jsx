@@ -2,11 +2,13 @@ import React, { useState,useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {FaCog } from 'react-icons/fa';
 import WalletModal from './WalletModal';
+import axios from 'axios';
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const userToken = localStorage.getItem('usertoken');
+  const userId = localStorage.getItem('userId');
   const adminToken = localStorage.getItem('admintoken');
   const [wallet, setWallet] = useState([]);
   
@@ -46,9 +48,16 @@ const Header = () => {
   
 
 useEffect(() => {
-  const walletData = JSON.parse(localStorage.getItem('wallet')) || [];
-  console.log("Wallet Data:", walletData);
-  setWallet(walletData);
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/user/wallet/${userId}`);
+      setWallet(response.data);
+    } catch (error) {
+      console.error('Error fetching wallet data:', error);
+    }
+  }
+  
+  fetchData();
 }, []);
 
 useEffect(() => {
@@ -179,24 +188,7 @@ useEffect(() => {
             {adminToken !== null ? 'Admin Dashboard' : 'Login as Admin'}
           </button>
         ) : (
-          userToken && UserDashboardPage ? (
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"
-              onClick={() => {
-                adminToken ? navigate('/admin') : navigate('/admin-login');
-              }}
-            >
-              {adminToken ? 'Admin Dashboard' : 'Login as Admin'}
-            </button>
-
-          ) : (
-            <button
-              className={!AdminPage ? "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2" : "bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded ml-2"}
-              onClick={() => navigate('/')}  // Redirect to homepage if already logged in
-            >
-              Go to User Admin
-            </button>
-          )
+          null
         )
         }
 

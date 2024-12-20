@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { WALLET_DEPOSITE, WALLET_WITHDRAW } from '../constants/apiEndpoints';
 
 const WalletModal = ({ visibleFundingWallet, toggleModal }) => {
   const [activeTab, setActiveTab] = useState('deposit'); // 'deposit' or 'withdrawal'
@@ -17,8 +18,8 @@ const WalletModal = ({ visibleFundingWallet, toggleModal }) => {
     setMessage('');
     const endpoint =
       action === 'withdrawal'
-        ? 'http://localhost:5000/api/wallet/withdrawl' // Your withdrawal API endpoint
-        : 'http://localhost:5000/api/user/wallet/balance'; // Replace with the deposit API endpoint
+        ? WALLET_WITHDRAW // Your withdrawal API endpoint
+        : WALLET_DEPOSITE; // Replace with the deposit API endpoint
 
     try {
       const payload = {

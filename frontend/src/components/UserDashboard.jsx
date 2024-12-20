@@ -2,17 +2,17 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import "./UserDashboard.css";
 import {BASE_URL} from "../constants/config";
-import { GET_ALL_GAMES } from '../constants/apiEndpoints';
-
+import { GET_ALL_GAMES, GET_ALL_SLIDERS } from '../constants/apiEndpoints';
+import CarouselComponent from './CarousalComponent';
 const UserDashboard = () => {
   const user = localStorage.getItem('username') || "VikramSah291";
   const [games, setGames] = useState([]);
+  const [sliders, setSliders] = useState([]);
 
-
-  //fetch the list of the games on page load
 
   useEffect(() => {
     fetchGames();
+    fetchSliders();
   }, []);
 
   const fetchGames = async () => {
@@ -24,6 +24,15 @@ const UserDashboard = () => {
       console.error(err);
     }
   };
+
+   const fetchSliders = async () => {
+      try {
+        const response = await axios.get(GET_ALL_SLIDERS);
+        setSliders(response.data);
+      } catch (error) {
+        console.error("Error fetching sliders:", error);
+      }
+    };
 
   const scrollGames = (direction) => {
     const container = document.getElementById("gamesContainer");
@@ -47,6 +56,8 @@ const UserDashboard = () => {
     }
   };
 
+  
+
 
 
   return (
@@ -55,58 +66,50 @@ const UserDashboard = () => {
 
       {/* Main Content */}
       <main className="container mx-auto p-2 flex flex-col items-center">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-6xl">
-          {/* User Card */}
-          <div className="bg-gray-800 rounded-lg p-4 flex flex-col justify-between">
-            <div>
-              <h3 className="text-xl font-semibold mb-2">{user}</h3>
-              <p className="text-sm text-gray-400">Your VIP Progress →</p>
+        {/* Static Card */}
+        <div className='w-full flex justify-between mt-10'>
+        <div className="bg-gray-800 rounded-lg p-4 w-full max-w-md flex flex-col justify-between">
+          <div>
+            <h3 className="text-xl font-semibold mb-2">Your VIP Progress</h3>
+            <p className="text-sm text-gray-400">{user}</p>
+          </div>
+          <div className="mt-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-400">0.00%</p>
+              <span className="text-gray-500">ⓘ</span>
             </div>
-            <div className="mt-4">
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-gray-400">0.00%</p>
-                <span className="text-gray-500">ⓘ</span>
-              </div>
-              <div className="w-full bg-gray-700 h-2 rounded-full mt-2">
-                <div className="bg-blue-500 h-2 rounded-full" style={{ width: '0%' }}></div>
-              </div>
-            </div>
-            <div className="mt-4 flex justify-between items-center">
-              <p className="text-gray-500">None</p>
-              <p className="text-yellow-500">★ Bronze</p>
+            <div className="w-full bg-gray-700 h-2 rounded-full mt-2">
+              <div className="bg-blue-500 h-2 rounded-full" style={{ width: "0%" }}></div>
             </div>
           </div>
-
-          {/* Casino Card */}
-          <div className="bg-gray-800 rounded-lg gap-4 flex flex-col items-center justify-center">
-
-            <img
-              src="./casino.jpg" // Replace with actual image URL
-              alt="Casino"
-              className="rounded-lg w-full "
-            />
-            <p className="font-semibold pb-2">Casino</p>
-
-          </div>
-
-          {/* Sportsbook Card */}
-          <div className="bg-gray-800 rounded-lg gap-4 flex flex-col items-center justify-center">
-
-            <img
-              src="./sportsGames.jpg" // Replace with actual image URL
-              alt="Sportsbook"
-              className="rounded-lg w-full h-full "
-            />
-            <p className="font-semibold pb-2">Sportsbook</p>
-
+          <div className="mt-4 flex justify-between items-center">
+            <p className="text-gray-500">None</p>
+            <p className="text-yellow-500">★ Bronze</p>
           </div>
         </div>
+        <CarouselComponent dynamicCards={sliders} />
+        </div>
 
-        {/* Trending Games Section */}
-        {/* if the games are present, then put it here otherwise show the existing trending games */}
 
         <div className="mt-8 w-full max-w-6xl relative overflow-hidden">
+          <div className='flex flex-row justify-between'>
           <h2 className="text-2xl font-semibold mb-4">Trending Games</h2>
+          <div className="absolute top-1/2 transform -translate-y-1/2 right-0 flex gap-0 top-4">
+            <button
+              className="bg-gray-800 text-white px-2 py-1 rounded-full hover:bg-gray-700"
+              onClick={() => scrollGames("left")}
+            >
+              ‹
+            </button>
+            <button
+              className="bg-gray-800 text-white px-2 py-1 rounded-full hover:bg-gray-700"
+              onClick={() => scrollGames("right")}
+            >
+              ›
+            </button>
+          </div>
+          </div>
+          
 
           {/* Scrollable container */}
           <div
@@ -146,20 +149,7 @@ const UserDashboard = () => {
           </div>
 
           {/* Floating Navigation Buttons */}
-          <div className="absolute top-1/2 transform -translate-y-1/2 right-0 flex gap-0 mt-2">
-            <button
-              className="bg-gray-800 text-white p-2 rounded-full hover:bg-gray-700"
-              onClick={() => scrollGames("left")}
-            >
-              ‹
-            </button>
-            <button
-              className="bg-gray-800 text-white p-2 rounded-full hover:bg-gray-700"
-              onClick={() => scrollGames("right")}
-            >
-              ›
-            </button>
-          </div>
+          
         </div>
 
 
@@ -196,7 +186,7 @@ const UserDashboard = () => {
               >
                 {/* Sport Image */}
                 <img
-                  src={sport.image}
+                  src={`${BASE_URL}/uploads/${sport.image}` || sport.image}
                   alt={sport.name}
                   className="w-full h-32 object-cover"
                 />
@@ -211,131 +201,10 @@ const UserDashboard = () => {
           </div>
         </div>
 
-        {/* Races & Raffles Section */}
-        <div className="mt-8 w-full max-w-6xl">
-          {/* Section Title */}
-          <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
-            <span className="text-blue-400">🏁</span> Races & Raffles
-          </h2>
-
-          {/* Card Container */}
-          <div className="flex gap-4">
-            {/* Card 1: $10m Christmas Race */}
-            <div className="bg-gray-800 flex-1 rounded-lg p-4 flex flex-col justify-between">
-              {/* Card Header */}
-
-
-
-              <div className="flex justify-between items-center mt-2">
-
-
-                <div>
-                  <h3 className="text-white text-lg font-semibold">$10m Christmas Race</h3>
-                  <p className="text-gray-400 text-sm mt-1">Ready to race to the top?</p>
-                  <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mt-10">
-                    Leaderboard
-                  </button>
-                </div>
-                {/* Button */}
-
-                <div className="relative w-40 h-40">
-                  <svg className="w-full h-full" viewBox="0 0 36 36">
-                    <circle
-                      className="text-gray-600"
-                      strokeWidth="3"
-                      stroke="currentColor"
-                      fill="transparent"
-                      r="15"
-                      cx="18"
-                      cy="18"
-                    />
-                    <circle
-                      className="text-blue-500"
-                      strokeWidth="3"
-                      stroke="currentColor"
-                      fill="transparent"
-                      r="15"
-                      cx="18"
-                      cy="18"
-                      style={{ strokeDasharray: "94", strokeDashoffset: "25" }} // Adjust progress dynamically
-                    />
-                  </svg>
-                  <p className="absolute inset-0 flex items-center justify-center text-white text-md">
-                    Ends in<br />22d 8h
-                  </p>
-                </div>
-              </div>
-
-
-              {/* Footer */}
-              <div className="flex items-center mt-4">
-                <span className="text-gray-400 text-sm flex items-center gap-2">
-                  <i className="text-white">ℹ️</i> Not entered yet
-                </span>
-              </div>
-            </div>
-
-            {/* Card 2: $75k Weekly Raffle */}
-            <div className="bg-gray-800 flex-1 rounded-lg p-4 flex flex-col justify-between">
-              {/* Card Header */}
-             
-
-              {/* Center Content */}
-              <div className="flex justify-between items-center mt-2">
-                {/* Circular Progress */}
-
-                <div>
-                <h3 className="text-white text-lg font-semibold">$75k Weekly Raffle</h3>
-                <p className="text-gray-400 text-sm mt-1">Finish your week with a win!</p>
-                <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mt-10">
-                  0 Tickets
-                </button>
-              </div>
-
-
-                {/* Button */}
-                
-                <div className="relative w-40 h-40">
-                  <svg className="w-full h-full" viewBox="0 0 36 36">
-                    <circle
-                      className="text-gray-600"
-                      strokeWidth="3"
-                      stroke="currentColor"
-                      fill="transparent"
-                      r="15"
-                      cx="18"
-                      cy="18"
-                    />
-                    <circle
-                      className="text-blue-500"
-                      strokeWidth="3"
-                      stroke="currentColor"
-                      fill="transparent"
-                      r="15"
-                      cx="18"
-                      cy="18"
-                      style={{ strokeDasharray: "94", strokeDashoffset: "50" }} // Adjust progress dynamically
-                    />
-                  </svg>
-                  <p className="absolute inset-0 flex items-center justify-center text-white text-md">
-                    Ends in<br />4d 8h
-                  </p>
-                </div>
-              </div>
-
-              {/* Footer */}
-              <div className="mt-4">
-                <div className="w-full bg-gray-700 h-2 rounded-full">
-                  <div
-                    className="bg-blue-500 h-2 rounded-full"
-                    style={{ width: "0%" }} // Adjust dynamically
-                  ></div>
-                </div>
-                <p className="text-gray-400 text-right text-sm mt-1">0%</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        
+            
+          
+        
 
 
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { GET_ALL_BANK_ACCOUNTS, UPDATE_BANK_ACCOUNT } from "../constants/apiEndpoints";
 
 const BankAccountList = () => {
   const [bankAccounts, setBankAccounts] = useState([]);
@@ -12,7 +13,7 @@ const BankAccountList = () => {
   // Fetch all bank accounts
   const fetchBankAccounts = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/bankaccount/getall"); // Replace with your backend URL
+      const response = await axios.get(GET_ALL_BANK_ACCOUNTS); // Replace with your backend URL
       setBankAccounts(response.data);
       setFilteredAccounts(response.data); // Set filteredAccounts initially to all accounts
       setLoading(false);
@@ -44,7 +45,7 @@ const BankAccountList = () => {
   // Update account status
   const updateStatus = async (id, newStatus) => {
     try {
-      await axios.put(`http://localhost:5000/api/bankaccount/update/${id}`, {
+      await axios.put(UPDATE_BANK_ACCOUNT(id), {
         status: newStatus,
       });
       setMessage(`Status updated to ${newStatus === 1 ? "Verified" : "Rejected"}.`);

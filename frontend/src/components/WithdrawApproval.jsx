@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { WALLET_WITHDRAW, WITHDRAWL_STATUS_UPDATE_BY_ADMIN } from "../constants/apiEndpoints";
 
 const WithdrawalApproval = () => {
   const [withdrawals, setWithdrawals] = useState([]); // Withdrawal requests
@@ -11,7 +12,7 @@ const WithdrawalApproval = () => {
     setLoading(true);
     setMessage("");
     try {
-      const response = await axios.get("http://localhost:5000/api/wallet/withdrawl"); // Replace with your API endpoint
+      const response = await axios.get(WALLET_WITHDRAW); // Replace with your API endpoint
       console.log(response.data);
       setWithdrawals(response.data);
     } catch (error) {
@@ -24,7 +25,7 @@ const WithdrawalApproval = () => {
   // Handle approval or rejection
   const handleStatusUpdate = async (id, newStatus, balance, cryptoname) => {
     try {
-      await axios.put(`http://localhost:5000/api/wallet/withdrawl/${id}`, {
+      await axios.put(WITHDRAWL_STATUS_UPDATE_BY_ADMIN(id) , {
         status: newStatus,
         balance: balance,
         cryptoname: cryptoname

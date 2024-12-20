@@ -141,6 +141,24 @@ router.get('/user/:id', async (req, res) => {
 });
 
 
+//Get one user's wallet by id
+router.get('/wallet/:id', async (req, res) => {
+  const userId = req.params.id;
+  console.log(userId, "name");
+  try {
+    const query = "SELECT * FROM wallet WHERE userId = ? ";
+    connection.query(query, [userId], (err, results) => {
+      if (err) return res.status(500).json({ error: 'Database query error' });
+      if (results.length === 0) return res.status(404).json({ error: 'User not found' });
+      
+      res.json(results);
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching user' });
+  }
+});
+
+
 
 // Delete user by ID
 router.delete('/user/:id', async (req, res) => {
@@ -328,7 +346,7 @@ router.put('/wallet/balance', async (req, res) => {
   try {
     const query = `
       UPDATE wallet
-      SET balance = ?
+      SET balance = balance + ?
       WHERE userId = ? AND cryptoname = ?
     `;
 
@@ -346,7 +364,7 @@ router.put('/wallet/balance', async (req, res) => {
         message: 'Wallet balance updated successfully',
         userId,
         cryptoname,
-        balance,
+        newBalance: `Added ${balance} to the existing balance`,
       });
     });
   } catch (error) {
@@ -354,6 +372,7 @@ router.put('/wallet/balance', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 
