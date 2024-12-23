@@ -270,68 +270,81 @@ router.put('/user/:id/password', async (req, res) => {
 
 
 
-// Special update route for aadhar, pan, and kycstatus
-router.put("/user/:id/kyc", upload.fields([
-  { name: "aadharImage", maxCount: 1 },
-  { name: "panImage", maxCount: 1 }
-]), async (req, res) => {
-  const userId = req.params.id;
-  const { kycstatus } = req.body;
+router.put(
+  "/user/:id/kyc",
+  upload.fields([
+    { name: "aadharImage", maxCount: 1 },
+    { name: "panImage", maxCount: 1 },
+  ]),
+  async (req, res) => {
+    const userId = req.params.id;
+    const { kycstatus = 0 } = req.body;
 
-  // File paths for uploaded images
-  const aadhar = req.files["aadharImage"] ? req.files["aadharImage"][0].filename : null;
-  const pan = req.files["panImage"] ? req.files["panImage"][0].filename : null;
+    console.log("Files received in request:", req.files);
+    console.log("Body:", req.body);
 
-  if (!kycstatus || (!aadhar && !pan)) {
-    return res.status(400).json({ error: "KYC status and at least one image are required" });
-  }
+    const aadhar = req.files?.aadharImage?.[0]?.filename || null;
+    const pan = req.files?.panImage?.[0]?.filename || null;
 
-  try {
-    // Prepare query and parameters
-    const fieldsToUpdate = [];
-    const values = [];
+    console.log("Processed Inputs:", { aadhar, pan, kycstatus, userId });
 
-    if (aadhar) {
-      fieldsToUpdate.push("aadhar = ?");
-      values.push(aadhar);
-    }
-    if (pan) {
-      fieldsToUpdate.push("pan = ?");
-      values.push(pan);
+    if (!aadhar && !pan) {
+      return res
+        .status(400)
+        .json({ error: "At least one image is required for KYC update" });
     }
 
-    fieldsToUpdate.push("kycstatus = ?");
-    values.push(kycstatus);
-    values.push(userId);
+    try {
+      const fieldsToUpdate = [];
+      const values = [];
 
-    const query = `
-      UPDATE users 
-      SET ${fieldsToUpdate.join(", ")}
-      WHERE id = ?
-    `;
-
-    connection.query(query, values, (err, results) => {
-      if (err) {
-        console.error("Database query error:", err);
-        return res.status(500).json({ error: "Database query error" });
+      if (aadhar) {
+        fieldsToUpdate.push("aadhar = ?");
+        values.push(aadhar);
+      }
+      if (pan) {
+        fieldsToUpdate.push("pan = ?");
+        values.push(pan);
       }
 
-      if (results.affectedRows === 0) {
-        return res.status(404).json({ error: "User not found" });
-      }
+      fieldsToUpdate.push("kycstatus = ?");
+      values.push(kycstatus);
+      values.push(userId);
 
-      res.json({
-        message: "KYC details updated successfully",
-        aadhar: aadhar || "No change",
-        pan: pan || "No change",
-        kycstatus,
+      const query = `
+        UPDATE users 
+        SET ${fieldsToUpdate.join(", ")} 
+        WHERE id = ?
+      `;
+
+      console.log("Generated Query:", query);
+      console.log("Query Values:", values);
+
+      connection.query(query, [aadhar,pan,kycstatus,userId], (err, results) => {
+        if (err) {
+          console.error("Database query error:", err);
+          return res.status(500).json({ error: "Database query error" });
+        }
+
+        if (results.affectedRows === 0) {
+          return res.status(404).json({ error: "User not found" });
+        }
+
+        res.json({
+          message: "KYC details updated successfully",
+          aadhar: aadhar || "No change",
+          pan: pan || "No change",
+          kycstatus,
+        });
       });
-    });
-  } catch (error) {
-    console.error("Error updating KYC details:", error);
-    res.status(500).json({ error: "Internal server error" });
+    } catch (error) {
+      console.error("Error updating KYC details:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
   }
-});
+);
+
+
 
 
 // Update balance for a specific cryptoname and userId
@@ -356,9 +369,9 @@ router.put('/wallet/balance', async (req, res) => {
         return res.status(500).json({ error: 'Database query error' });
       }
 
-      if (results.affectedRows === 0) {
-        return res.status(404).json({ error: 'Wallet entry not found for the specified userId and cryptoname.' });
-      }
+      // if (results.affectedRows === 0) {
+      //   return res.status(404).json({ error: 'Wallet entry not found for the specified userId and cryptoname.' });
+      // }
 
       res.json({
         message: 'Wallet balance updated successfully',

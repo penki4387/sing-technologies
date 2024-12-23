@@ -121,19 +121,7 @@ const Homepage = () => {
                 </li>
               </ul>
             </li>
-            <li>
-              <button
-                onClick={() => setActiveComponent("settings")}
-                className="w-full text-center py-3 px-6"
-                style={{
-                  backgroundColor: hoverSidebarElement === "Settings" ? "rgba(61, 89, 72, 255)" : "rgba(51, 79, 62, 255)",
-                }}
-                onMouseEnter={() => setHoverSidebarElement("Settings")}
-                onMouseLeave={() => setHoverSidebarElement(null)}
-              >
-                Settings
-              </button>
-            </li>
+            
             <li>
               <button
                 onClick={() => setIsProfileOpen((prev) => !prev)}

@@ -25,7 +25,7 @@ export const DELETE_GAME = (id) => `${BASE_URL}/api/games/deletegame/${id}`;
   //Wallet Deposite and Withdrawl
 
   export const WALLET_WITHDRAW = `${BASE_URL}/api/wallet/withdrawl`;
-  export const WALLET_DEPOSITE = `${BASE_URL}api/user/wallet/balance`;
+  export const WALLET_DEPOSITE = `${BASE_URL}/api/user/wallet/balance`;
   export const WITHDRAWL_STATUS_UPDATE_BY_ADMIN = (id) => `${BASE_URL}/api/wallet/withdrawl/${id}`;
 
 //Admin 

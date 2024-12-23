@@ -7,54 +7,92 @@ const WalletModal = ({ visibleFundingWallet, toggleModal }) => {
   const [inputValue, setInputValue] = useState(''); // Input field state
   const [cryptoname, setCryptoname] = useState('BTC'); // Cryptoname selection
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState(''); // Success/Error message
+  const [message, setMessage] = useState({message:'',type:''}); // Success/Error message
   const userId = localStorage.getItem('userId');
 
   // API Call Function
   const handleApiCall = async (action) => {
-    if (!inputValue) return alert("Please enter a valid amount!");
+    if (!inputValue) return alert('Please enter a valid amount!');
 
     setLoading(true);
-    setMessage('');
+    setMessage({message:'',type:''});
     const endpoint =
-      action === 'withdrawal'
-        ? WALLET_WITHDRAW // Your withdrawal API endpoint
-        : WALLET_DEPOSITE; // Replace with the deposit API endpoint
+      action === 'withdrawal' ? WALLET_WITHDRAW : WALLET_DEPOSITE;
 
     try {
+      if (action === 'withdrawal') {
+        // Fetch wallet details
+        const walletDetails = await axios.get(`http://localhost:5000/api/user/wallet/${userId}`);
+        const wallet = walletDetails.data.find((w) => w.cryptoname === cryptoname);
+
+        if (!wallet) {
+          setMessage({message:`No wallet found for ${cryptoname}.`,type:"Error"});
+          setTimeout(() => setMessage({message:'',type:''}), 3000);
+          return;
+        }
+
+        const availableBalance = wallet.balance; // Current balance
+        const minWithdrawLimit = cryptoname === 'INR' ? 500 : 10;
+
+        // Check minimum withdrawal limit
+        if (parseFloat(inputValue) < minWithdrawLimit) {
+          setMessage({message:`Minimum withdrawal limit is ${minWithdrawLimit} ${cryptoname}.`,type:"Error"});
+          setTimeout(() => setMessage({message:'',type:''}), 3000);
+
+          return;
+        }
+
+        // Check sufficient balance
+        if (parseFloat(inputValue) > availableBalance) {
+          setMessage({message:`Insufficient balance. Available: ${availableBalance} ${cryptoname}.`,type:"Error"});
+          setTimeout(() => setMessage({message:'',type:''}), 3000);
+
+          return;
+        }
+      }
+
       const payload = {
-        userId: userId, // Replace with actual user ID
+        userId: userId,
         balance: inputValue,
         cryptoname: cryptoname,
         status: 0, // Default status for withdrawal
       };
 
-      const response = action === 'withdrawal' ? await axios.post(endpoint, payload) : await axios.put(endpoint, payload);
+      const response =
+        action === 'withdrawal'
+          ? await axios.post(endpoint, payload)
+          : await axios.put(endpoint, payload);
+
       console.log(`${action} success:`, response.data);
-      setMessage(`${action.charAt(0).toUpperCase() + action.slice(1)} Successful!`);
+      setMessage({message:`${action.charAt(0).toUpperCase() + action.slice(1)} Successful!`,type:"Success"});
+      setTimeout(() => setMessage({message:'',type:''}), 3000);
+
       setInputValue('');
     } catch (error) {
       console.error(`${action} error:`, error.response?.data || error.message);
-      setMessage(`Failed to ${action}.`);
+      setMessage({message:`Failed to ${action}.`,type:"Error"});
+      setTimeout(() => setMessage({message:'',type:''}), 3000);
+
     } finally {
       setLoading(false);
     }
   };
-  
-const options = [
-  {value:"BTC",label:"BTC"},
-  {value:"ETH",label:"ETH"},
-  {value:"LTC",label:"LTC"},
-  {value:"USDT",label:"USDT"},
-  {value:"SOL",label:"SOL"},
-  {value:"DOGE",label:"DOGE"},
-  {value:"BCH",label:"BCH"},
-  {value:"XRP",label:"XRP"},
-  {value:"TRX",label:"TRX"},
-  {value:"EOS",label:"EOS"},
-  {value:"INR",label:"INR"},
-  {value:"CP",label:"CP"},
-]
+
+  const options = [
+    { value: 'BTC', label: 'BTC' },
+    { value: 'ETH', label: 'ETH' },
+    { value: 'LTC', label: 'LTC' },
+    { value: 'USDT', label: 'USDT' },
+    { value: 'SOL', label: 'SOL' },
+    { value: 'DOGE', label: 'DOGE' },
+    { value: 'BCH', label: 'BCH' },
+    { value: 'XRP', label: 'XRP' },
+    { value: 'TRX', label: 'TRX' },
+    { value: 'EOS', label: 'EOS' },
+    { value: 'INR', label: 'INR' },
+    { value: 'CP', label: 'CP' },
+  ];
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 w-full">
       <div className="bg-white rounded-lg shadow-lg w-11/12 md:w-1/3 flex flex-col h-[500px] text-black">
@@ -89,6 +127,17 @@ const options = [
           <h2 className="text-xl font-bold mb-4 text-center">
             {activeTab === 'deposit' ? 'Deposit Funds' : 'Withdraw Funds'}
           </h2>
+
+          {message.message && (
+            <p
+              className={`my-4 text-center font-semibold ${
+                message.type === 'Error'?'text-red-500' : 'text-green-500'
+              }`}
+            >
+              {message.message}
+            </p>
+            
+          )}
 
           {/* Cryptoname Selection */}
           <div className="mb-4">
@@ -126,20 +175,8 @@ const options = [
             {loading ? 'Processing...' : `Confirm ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}`}
           </button>
 
-          {/* Message Display */}
-          {message && (
-            <p
-              className={`mt-4 text-center font-semibold ${
-                message.includes('Failed') ? 'text-red-500' : 'text-green-500'
-              }`}
-            >
-              {message}
-            </p>
-            
-
-
-            
-          )}
+          
+          
         </div>
 
         {/* Close Button */}

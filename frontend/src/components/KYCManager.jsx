@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../constants/config"; // Adjust as per your project
-import { GET_KYC_DETAILS_BY_USER_ID, UPDATE_KYC_STATUS } from "../constants/apiEndpoints";
+import { GET_USER_BY_ID, UPDATE_KYC_STATUS } from "../constants/apiEndpoints";
 
 const KYCManager = () => {
   const userId = localStorage.getItem("userId");
   const [kycDetails, setKYCDetails] = useState({
-    kycstatus: 0,
     aadharImage: null,
     panImage: null,
   });
@@ -20,15 +19,16 @@ const KYCManager = () => {
 
   const fetchKYCDetails = async () => {
     try {
-      const response = await axios.get(GET_KYC_DETAILS_BY_USER_ID(userId));
-      const { kycstatus, aadharImage, panImage } = response.data;
+      const response = await axios.get(GET_USER_BY_ID(userId));
+      
+      const { aadhar, pan } = response.data;
+      
       setKYCDetails({
-        kycstatus: kycstatus || 0,
-        aadharImage: aadharImage
-          ? `${BASE_URL}/uploads/${aadharImage}`
+        aadharImage: aadhar
+          ? `${BASE_URL}/uploads/${aadhar}`
           : null,
-        panImage: panImage
-          ? `${BASE_URL}/uploads/${panImage}`
+        panImage: pan
+          ? `${BASE_URL}/uploads/${pan}`
           : null,
       });
       setLoading(false);
@@ -48,7 +48,6 @@ const KYCManager = () => {
     e.preventDefault();
 
     const formData = new FormData();
-    formData.append("kycstatus", kycDetails.kycstatus);
     if (kycDetails.aadharImage instanceof File)
       formData.append("aadharImage", kycDetails.aadharImage);
     if (kycDetails.panImage instanceof File)
@@ -59,10 +58,16 @@ const KYCManager = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setMessage("KYC details updated successfully.");
+      setTimeout(() => {
+        setMessage('')
+      },3000);
       fetchKYCDetails();
     } catch (error) {
       console.error("Error updating KYC details:", error);
       setMessage("Error updating KYC details.");
+      setTimeout(() => {
+        setMessage('')
+      },3000);
     }
   };
 
@@ -85,13 +90,14 @@ const KYCManager = () => {
             />
             {kycDetails.aadharImage && (
               <img
+              
                 src={
                   kycDetails.aadharImage instanceof File
                     ? URL.createObjectURL(kycDetails.aadharImage)
                     : kycDetails.aadharImage
                 }
                 alt="Aadhar Preview"
-                className="mt-2 h-32 w-full object-cover rounded"
+                className="mt-2 h-20 w-20 object-cover rounded"
               />
             )}
           </div>
@@ -114,26 +120,9 @@ const KYCManager = () => {
                     : kycDetails.panImage
                 }
                 alt="PAN Preview"
-                className="mt-2 h-32 w-full object-cover rounded"
+                className="mt-2 h-20 w-20 object-cover rounded"
               />
             )}
-          </div>
-
-          {/* KYC Status */}
-          <div>
-            <label className="block mb-1 font-medium">KYC Status</label>
-            <select
-              name="kycstatus"
-              value={kycDetails.kycstatus}
-              onChange={(e) =>
-                setKYCDetails({ ...kycDetails, kycstatus: e.target.value })
-              }
-              className="w-full p-2 border rounded"
-            >
-              <option value={0}>Pending</option>
-              <option value={1}>Approved</option>
-              <option value={2}>Rejected</option>
-            </select>
           </div>
 
           {/* Submit Button */}

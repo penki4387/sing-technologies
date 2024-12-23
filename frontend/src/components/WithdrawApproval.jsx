@@ -6,6 +6,7 @@ const WithdrawalApproval = () => {
   const [withdrawals, setWithdrawals] = useState([]); // Withdrawal requests
   const [loading, setLoading] = useState(false); // Loading state
   const [message, setMessage] = useState(""); // Status messages
+  const [status, setStatus] = useState("3");
 
   // Fetch withdrawal requests
   const fetchWithdrawals = async () => {
@@ -14,13 +15,20 @@ const WithdrawalApproval = () => {
     try {
       const response = await axios.get(WALLET_WITHDRAW); // Replace with your API endpoint
       console.log(response.data);
-      setWithdrawals(response.data);
+      console.log(status,"just before filter")
+      const filteredWithdrawals = status == "3" ? response.data : response.data.filter((withdrawal) => withdrawal.status === status)
+      console.log(filteredWithdrawals);
+      setWithdrawals(filteredWithdrawals)
     } catch (error) {
       console.error("Error fetching withdrawals:", error);
       setMessage("Failed to fetch withdrawals.");
     }
     setLoading(false);
   };
+
+  useEffect(() =>{
+fetchWithdrawals();
+  },[status])
 
   // Handle approval or rejection
   const handleStatusUpdate = async (id, newStatus, balance, cryptoname) => {
@@ -51,16 +59,12 @@ const WithdrawalApproval = () => {
         <label className="mr-2">Filter by Status:</label>
         <select
           onChange={(e) => {
-            const status = e.target.value;
-            if (status === "all") {
-              fetchWithdrawals();
-            } else {
-              const filteredWithdrawals = withdrawals.filter((withdrawal) => withdrawal.status === status);
-              setWithdrawals(filteredWithdrawals);
-            }
+            setStatus(e.target.value)
+            
+            
           }}
         >
-          <option value="all">All</option>
+          <option value="3">All</option>
           <option value="0">Pending</option>
           <option value="1">Approved</option>
           <option value="2">Rejected</option>
