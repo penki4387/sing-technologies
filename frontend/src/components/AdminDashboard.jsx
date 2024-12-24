@@ -7,6 +7,7 @@ import "./UserDashboard.css"
 import AdminHome from './AdminHome';
 import WithdrawalApproval from './WithdrawApproval';
 import SliderManager from './SlideManager';
+import AdminBankAccountslist from "./AdminBankAccountslist"
 
 const AdminDashboard = () => {
   const [activeComponent, setActiveComponent] = useState('dashboard');
@@ -26,8 +27,10 @@ const AdminDashboard = () => {
         return <WithdrawalApproval />;
       case 'sliders':
         return <SliderManager />;
+        case 'bankAccounts':
+          return <AdminBankAccountslist/>
       default:
-        return <AdminHome />;
+        return <AdminHome activeComponent={setActiveComponent}/>;
     }
   };
 
@@ -62,6 +65,17 @@ const AdminDashboard = () => {
                 onMouseLeave={() => setHoverSidebarElement(null)}
               >
                 Users
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => setActiveComponent('bankAccounts')}
+                className={hoverSidebarElement === "bankAccounts" ? "w-full text-center py-3 px-6 bg-gray-600" : "w-full text-center py-3 px-6 bg-gray-700"}
+
+                onMouseEnter={() => setHoverSidebarElement("bankAccounts")}
+                onMouseLeave={() => setHoverSidebarElement(null)}
+              >
+                Bank Accounts
               </button>
             </li>
 

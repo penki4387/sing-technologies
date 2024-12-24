@@ -65,7 +65,8 @@ const BankAccountManager = () => {
           branch: formData.branch,
           status: 0, 
         });
-        response.status === 200 ? alert("Account created successfully") : alert("Error creating account");
+        console.log(response,"response");
+        response.status === 201 ? alert("Account created successfully") : alert("Error creating account");
       }
 
       fetchAccounts();

@@ -2,10 +2,13 @@ import { useEffect,useState } from "react";
 import axios from "axios";
 import { GET_ALL_USERS, GET_ALL_GAMES } from "../constants/apiEndpoints";
 import AdminBankAccountslist from "./AdminBankAccountslist";
-const AdminHome = () => {
+import { useNavigate } from "react-router-dom";
+import Users from "./Users";
+const AdminHome = ({activeComponent}) => {
 
     const [users,setUsers] = useState([]);
     const[games,setGames] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -46,8 +49,11 @@ const AdminHome = () => {
                             <div>
                                 <h3 className="text-white text-lg font-semibold">Users</h3>
                                 <p className="text-gray-400 text-sm mt-1">Ready to race to the top?</p>
-                                <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mt-10">
-                                    Leaderboard
+                                <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mt-10"
+                                onClick={() =>{
+                                    activeComponent("users")
+                                }}>
+                                    Users
                                 </button>
                             </div>
                             {/* Button */}
@@ -102,8 +108,12 @@ const AdminHome = () => {
                             <div>
                                 <h3 className="text-white text-lg font-semibold">Games</h3>
                                 <p className="text-gray-400 text-sm mt-1">Finish your week with a win!</p>
-                                <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mt-10">
-                                    0 Tickets
+                                <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mt-10"
+                                onClick={() =>{
+                                    activeComponent('games')
+                                }}
+                                >
+                                    Games
                                 </button>
                             </div>
 
@@ -151,7 +161,7 @@ const AdminHome = () => {
 
                     </div >
                 </div >
-                <AdminBankAccountslist/>
+                <Users />
                </div>
 
 </div>
