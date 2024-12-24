@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { GET_ALL_BANK_ACCOUNTS, UPDATE_BANK_ACCOUNT } from "../constants/apiEndpoints";
+import { GET_ALL_BANK_ACCOUNTS, UPDATE_BANK_ACCOUNT } from "../../constants/apiEndpoints";
 
 const BankAccountList = () => {
   const [bankAccounts, setBankAccounts] = useState([]);

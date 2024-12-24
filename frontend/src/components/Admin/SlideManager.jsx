@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { BASE_URL } from "../constants/config";
-import { GET_ALL_SLIDERS, ADD_SLIDER, UPDATE_SLIDER, DELETE_SLIDER } from "../constants/apiEndpoints";
+import { BASE_URL } from "../../constants/config";
+import { GET_ALL_SLIDERS, ADD_SLIDER, UPDATE_SLIDER, DELETE_SLIDER } from "../../constants/apiEndpoints";
 
 const SliderManager = () => {
   const [sliders, setSliders] = useState([]);

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { WALLET_DEPOSITE, WALLET_WITHDRAW } from '../constants/apiEndpoints';
+import { WALLET_DEPOSITE, WALLET_WITHDRAW } from '../../constants/apiEndpoints';
 import { useNavigate, Link } from 'react-router-dom';
 
 const WalletModal = ({ visibleFundingWallet, toggleModal }) => {

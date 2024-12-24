@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { GET_USER_BY_ID, UPDATE_USER, UPDATE_USER_PASSWORD } from '../constants/apiEndpoints';
+import { GET_USER_BY_ID, UPDATE_USER, UPDATE_USER_PASSWORD } from '../../constants/apiEndpoints';
 
 const UserSettings = () => {
   const [user, setUser] = useState({

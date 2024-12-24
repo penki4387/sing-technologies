@@ -1,7 +1,7 @@
 import React, { useState,useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {FaCog } from 'react-icons/fa';
-import WalletModal from './WalletModal';
+import WalletModal from './User/WalletModal';
 import axios from 'axios';
 const Header = () => {
   const navigate = useNavigate();

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { WALLET_WITHDRAW, WITHDRAWL_STATUS_UPDATE_BY_ADMIN } from "../constants/apiEndpoints";
+import { WALLET_WITHDRAW, WITHDRAWL_STATUS_UPDATE_BY_ADMIN } from "../../constants/apiEndpoints";
 
 const WithdrawalApproval = () => {
   const [withdrawals, setWithdrawals] = useState([]); // Withdrawal requests

@@ -1,6 +1,6 @@
  import React, { useState } from 'react';
  import { Link,useNavigate } from 'react-router-dom';
- import Users from './Users';
+ import Users from './Admin/Users';
  const Sidebar = ({type}) => {
 
     const [activeComponent, setActiveComponent] = useState('dashboard');

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./UserDashboard.css";
-import { ADD_BANK_ACCOUNT, GET_ALL_BANK_ACCOUNTS, UPDATE_BANK_ACCOUNT, GET_BANK_ACCOUNTS_BY_USER_ID, DELETE_BANK_ACCOUNT } from "../constants/apiEndpoints";
+import { ADD_BANK_ACCOUNT, GET_ALL_BANK_ACCOUNTS, UPDATE_BANK_ACCOUNT, GET_BANK_ACCOUNTS_BY_USER_ID, DELETE_BANK_ACCOUNT } from "../../constants/apiEndpoints";
 
 const BankAccountManager = () => {
   const [accounts, setAccounts] = useState([]);
@@ -184,6 +184,7 @@ const BankAccountManager = () => {
                 <th className="border border-gray-300 p-2">Account Number</th>
                 <th className="border border-gray-300 p-2">IFSC Code</th>
                 <th className="border border-gray-300 p-2">Branch Name</th>
+                <th className="border border-gray-300 p-2">Status</th>
                 <th className="border border-gray-300 p-2">Actions</th>
               </tr>
             </thead>
@@ -195,6 +196,7 @@ const BankAccountManager = () => {
                   <td className="border border-gray-300 p-2">{account.accountnumber}</td>
                   <td className="border border-gray-300 p-2">{account.ifsccode}</td>
                   <td className="border border-gray-300 p-2">{account.branch}</td>
+                  <td className="border border-gray-300 p-2">{account.status === 0 ?"Pending":"Approved"}</td>
                   <td className="border border-gray-300 p-2">
                     <button
                       onClick={() => handleEdit(account)}

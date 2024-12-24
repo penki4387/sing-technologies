@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { BASE_URL } from "../constants/config";
-import { GET_ALL_GAMES } from '../constants/apiEndpoints';
+import { BASE_URL } from "../../constants/config";
+import { GET_ALL_GAMES } from '../../constants/apiEndpoints';
 
 const GamesComponent = () => {
   const [games, setGames] = useState([]);

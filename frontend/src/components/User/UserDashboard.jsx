@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import "./UserDashboard.css";
-import {BASE_URL} from "../constants/config";
-import { GET_ALL_GAMES, GET_ALL_SLIDERS } from '../constants/apiEndpoints';
-import CarouselComponent from './CarousalComponent';
+import {BASE_URL} from "../../constants/config";
+import { GET_ALL_GAMES, GET_ALL_SLIDERS } from '../../constants/apiEndpoints';
+import CarouselComponent from '../CarousalComponent';
 const UserDashboard = () => {
   const user = sessionStorage.getItem('username') || "VikramSah291";
   const [games, setGames] = useState([]);

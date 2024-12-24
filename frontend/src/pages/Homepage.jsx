@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import UserDashboard from "../components/UserDashboard";
-import BankAccountManager from "../components/BankAccountManager";
-import UserSettings from "../components/UserSettings";
-import KYCManager from "../components/KYCManager";
-import "../components/UserDashboard.css";
-import GamesComponent from "../components/GamesComponent";
+import UserDashboard from "../components/User/UserDashboard";
+import BankAccountManager from "../components/User/BankAccountManager";
+import UserSettings from "../components/User/UserSettings";
+import KYCManager from "../components/User/KYCManager";
+import "../components/User/UserDashboard.css";
+import GamesComponent from "../components/User/GamesComponent";
 const Homepage = () => {
   const [activeComponent, setActiveComponent] = useState("dashboard");
   const [selectedGame, setSelectedGame] = useState(null);

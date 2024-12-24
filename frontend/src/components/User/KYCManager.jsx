@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { BASE_URL } from "../constants/config"; // Adjust as per your project
-import { GET_USER_BY_ID, UPDATE_KYC_STATUS } from "../constants/apiEndpoints";
+import { BASE_URL } from "../../constants/config"; // Adjust as per your project
+import { GET_USER_BY_ID, UPDATE_KYC_STATUS } from "../../constants/apiEndpoints";
 
 const KYCManager = () => {
   const userId = sessionStorage.getItem("userId");

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { BASE_URL, } from "../constants/config";
-import {GET_ALL_GAMES, ADD_GAME, UPDATE_GAME, DELETE_GAME} from "../constants/apiEndpoints";
+import { BASE_URL, } from "../../constants/config";
+import {GET_ALL_GAMES, ADD_GAME, UPDATE_GAME, DELETE_GAME} from "../../constants/apiEndpoints";
 
 import { FaEdit, FaTrash } from "react-icons/fa";
 import "./UserDashboard.css"

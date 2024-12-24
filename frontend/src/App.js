@@ -2,10 +2,10 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminLogin from './pages/AdminLogin';
-import AdminDashboard from './components/AdminDashboard';
+import AdminDashboard from './components/Admin/AdminDashboard';
 import Layout from './pages/Layout';
 import Homepage from './pages/Homepage';
-import Users from './components/Users';
+import Users from './components/Admin/Users';
 import { UserPrivateRoute, AdminPrivateRoute } from './PrivateRoute';
 
 function App() {

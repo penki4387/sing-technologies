@@ -1,14 +1,13 @@
 import { useEffect,useState } from "react";
 import axios from "axios";
-import { GET_ALL_USERS, GET_ALL_GAMES } from "../constants/apiEndpoints";
-import AdminBankAccountslist from "./AdminBankAccountslist";
-import { useNavigate } from "react-router-dom";
+import { GET_ALL_USERS, GET_ALL_GAMES } from "../../constants/apiEndpoints";
+
 import Users from "./Users";
 const AdminHome = ({activeComponent}) => {
 
     const [users,setUsers] = useState([]);
     const[games,setGames] = useState([]);
-    const navigate = useNavigate();
+    
 
     useEffect(() => {
         const fetchUsers = async () => {
