@@ -22,8 +22,8 @@ const UserSettings = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const userId = localStorage.getItem('userId');
-        const username = localStorage.getItem('username');
+        const userId = sessionStorage.getItem('userId');
+        const username = sessionStorage.getItem('username');
 
         const response = await axios.get(GET_USER_BY_ID(userId));
         console.log(response,"reponse");
@@ -61,7 +61,7 @@ const UserSettings = () => {
     setMessage('');
 
     try {
-      const userId = localStorage.getItem('userId'); // Replace with logic to fetch logged-in user's ID
+      const userId = sessionStorage.getItem('userId'); // Replace with logic to fetch logged-in user's ID
 
       // Update user details
       await axios.put(UPDATE_USER(userId), user);

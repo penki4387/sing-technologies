@@ -13,7 +13,7 @@ const BankAccountManager = () => {
     branch: "",
   });
   const [editId, setEditId] = useState(null);
-  const userId = localStorage.getItem("userId");
+  const userId = sessionStorage.getItem("userId");
   console.log(userId);
 
   // Fetch all bank accounts on component mount

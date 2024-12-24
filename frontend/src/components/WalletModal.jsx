@@ -9,7 +9,7 @@ const WalletModal = ({ visibleFundingWallet, toggleModal }) => {
   const [cryptoname, setCryptoname] = useState('BTC'); // Cryptoname selection
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({message:'',type:''}); // Success/Error message
-  const userId = localStorage.getItem('userId');
+  const userId = sessionStorage.getItem('userId');
 
   const navigate = useNavigate();
 

@@ -5,7 +5,7 @@ import {BASE_URL} from "../constants/config";
 import { GET_ALL_GAMES, GET_ALL_SLIDERS } from '../constants/apiEndpoints';
 import CarouselComponent from './CarousalComponent';
 const UserDashboard = () => {
-  const user = localStorage.getItem('username') || "VikramSah291";
+  const user = sessionStorage.getItem('username') || "VikramSah291";
   const [games, setGames] = useState([]);
   const [sliders, setSliders] = useState([]);
 

@@ -7,9 +7,9 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const userToken = localStorage.getItem('usertoken');
-  const userId = localStorage.getItem('userId');
-  const adminToken = localStorage.getItem('admintoken');
+  const userToken = sessionStorage.getItem('usertoken');
+  const userId = sessionStorage.getItem('userId');
+  const adminToken = sessionStorage.getItem('admintoken');
   const [wallet, setWallet] = useState([]);
   
  
@@ -82,7 +82,7 @@ useEffect(() => {
 
 
   const handleLogout = () => {
-    localStorage.removeItem('usertoken');
+    sessionStorage.removeItem('usertoken');
     navigate('/login');
   };
 
@@ -216,7 +216,7 @@ useEffect(() => {
           <button
             className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2"
             onClick={() => {
-              localStorage.removeItem('admintoken');
+              sessionStorage.removeItem('admintoken');
               navigate('/admin-login');
             }}
           >

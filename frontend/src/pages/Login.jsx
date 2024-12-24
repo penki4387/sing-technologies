@@ -14,7 +14,7 @@ const Login = () => {
       value: value,
       expiry: now.getTime() + ttl,
     };
-    localStorage.setItem(key, JSON.stringify(item));
+    sessionStorage.setItem(key, JSON.stringify(item));
   };
   
   const handleSubmit = async (e) => {
@@ -36,16 +36,16 @@ const Login = () => {
 
       const twoHoursInMs = 2 * 60 * 60 * 1000; // Two hours in milliseconds
 
-      // Save token and user data to localStorage
+      // Save token and user data to sessionStorage
       setWithExpiry('usertoken', token, twoHoursInMs);
-      localStorage.setItem('username', user.username);
-      localStorage.setItem('email', user.email);
-      localStorage.setItem('fundingWallet', user.fundingWallet);
-      localStorage.setItem('supportWallet', user.supportWallet);
-      localStorage.setItem('userId', user.id);
+      sessionStorage.setItem('username', user.username);
+      sessionStorage.setItem('email', user.email);
+      sessionStorage.setItem('fundingWallet', user.fundingWallet);
+      sessionStorage.setItem('supportWallet', user.supportWallet);
+      sessionStorage.setItem('userId', user.id);
 
-      // Store wallet data in localStorage
-      localStorage.setItem('wallet', JSON.stringify(wallet));
+      // Store wallet data in sessionStorage
+      sessionStorage.setItem('wallet', JSON.stringify(wallet));
 
       alert('Login successful!');
       navigate('/dashboard'); // Redirect to dashboard or home page

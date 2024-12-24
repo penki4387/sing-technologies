@@ -4,7 +4,7 @@ import { BASE_URL } from "../constants/config"; // Adjust as per your project
 import { GET_USER_BY_ID, UPDATE_KYC_STATUS } from "../constants/apiEndpoints";
 
 const KYCManager = () => {
-  const userId = localStorage.getItem("userId");
+  const userId = sessionStorage.getItem("userId");
   const [kycDetails, setKYCDetails] = useState({
     aadharImage: null,
     panImage: null,

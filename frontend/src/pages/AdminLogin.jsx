@@ -15,18 +15,18 @@ const AdminLogin = () => {
       value: value,
       expiry: now.getTime() + ttl,
     };
-    localStorage.setItem(key, JSON.stringify(item));
+    sessionStorage.setItem(key, JSON.stringify(item));
   };
   
   const getWithExpiry = (key) => {
-    const itemStr = localStorage.getItem(key);
+    const itemStr = sessionStorage.getItem(key);
     if (!itemStr) {
       return null;
     }
     const item = JSON.parse(itemStr);
     const now = new Date();
     if (now.getTime() > item.expiry) {
-      localStorage.removeItem(key);
+      sessionStorage.removeItem(key);
       return null;
     }
     return item.value;
