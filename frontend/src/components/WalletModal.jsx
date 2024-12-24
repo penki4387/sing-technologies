@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { WALLET_DEPOSITE, WALLET_WITHDRAW } from '../constants/apiEndpoints';
+import { useNavigate, Link } from 'react-router-dom';
 
 const WalletModal = ({ visibleFundingWallet, toggleModal }) => {
   const [activeTab, setActiveTab] = useState('deposit'); // 'deposit' or 'withdrawal'
@@ -9,6 +10,8 @@ const WalletModal = ({ visibleFundingWallet, toggleModal }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({message:'',type:''}); // Success/Error message
   const userId = localStorage.getItem('userId');
+
+  const navigate = useNavigate();
 
   // API Call Function
   const handleApiCall = async (action) => {
@@ -45,7 +48,7 @@ const WalletModal = ({ visibleFundingWallet, toggleModal }) => {
         // Check sufficient balance
         if (parseFloat(inputValue) > availableBalance) {
           setMessage({message:`Insufficient balance. Available: ${availableBalance} ${cryptoname}.`,type:"Error"});
-          setTimeout(() => setMessage({message:'',type:''}), 3000);
+          setTimeout(() => setMessage({message:'',type:''}), 2000);
 
           return;
         }
@@ -65,9 +68,16 @@ const WalletModal = ({ visibleFundingWallet, toggleModal }) => {
 
       console.log(`${action} success:`, response.data);
       setMessage({message:`${action.charAt(0).toUpperCase() + action.slice(1)} Successful!`,type:"Success"});
-      setTimeout(() => setMessage({message:'',type:''}), 3000);
+      setTimeout(() => setMessage({message:'',type:''}), 2000);
+
+      // Delay for 2 seconds to show the success message, then navigate
+      setTimeout(() => {
+        toggleModal();
+        navigate("/dashboard");
+    }, 2000);
 
       setInputValue('');
+      
     } catch (error) {
       console.error(`${action} error:`, error.response?.data || error.message);
       setMessage({message:`Failed to ${action}.`,type:"Error"});

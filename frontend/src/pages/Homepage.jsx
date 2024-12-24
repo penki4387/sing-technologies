@@ -5,6 +5,7 @@ import BankAccountManager from "../components/BankAccountManager";
 import UserSettings from "../components/UserSettings";
 import KYCManager from "../components/KYCManager";
 import "../components/UserDashboard.css";
+import GamesComponent from "../components/GamesComponent";
 const Homepage = () => {
   const [activeComponent, setActiveComponent] = useState("dashboard");
   const [selectedGame, setSelectedGame] = useState(null);
@@ -24,7 +25,7 @@ const Homepage = () => {
           case "gameTypeA":
             return <div>Game Type A Content</div>;
           case "gameTypeB":
-            return <div>Game Type B Content</div>;
+            return <GamesComponent/>;
           default:
             return <div>Select a game to view details.</div>;
         }

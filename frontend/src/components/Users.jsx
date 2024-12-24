@@ -210,12 +210,12 @@ const Users = () => {
               </td>
               <td className="px-2 py-2">
                 
-                  <img src={`${BASE_URL}/uploads/${user.aadhar}g`} alt="Aadhar" className="w-8 h-8 rounded-full" />
+                  <img src={`${BASE_URL}/uploads/${user.aadhar}`} alt="Aadhar" className="w-8 h-8 rounded-full" />
               
               </td>
               <td className="px-2 py-2">
                 
-                  <img src={`${BASE_URL}/uploads/${user.pan}.png`} alt="PAN" className="w-8 h-8 rounded-full" />
+                  <img src={`${BASE_URL}/uploads/${user.pan}`} alt="PAN" className="w-8 h-8 rounded-full" />
               
               </td>
               <td className="px-2 py-2">

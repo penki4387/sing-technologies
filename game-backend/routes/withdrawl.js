@@ -4,27 +4,34 @@ const router = express.Router();
 
 // Create a new withdrawal entry and deduct balance from the wallet
 router.post('/withdrawl', async (req, res) => {
+  console.log("api called");
   const { userId, balance, cryptoname, status } = req.body;
+  console.log(userId,balance,cryptoname,status);
 
   if (!userId || !cryptoname || !balance || balance <= 0) {
+    console.log("I am in");
     return res.status(400).json({ error: 'Invalid input. userId, cryptoname, and a positive balance are required.' });
   }
+  console.log("I am here");
 
   try {
     // Start a transaction to ensure atomicity
-    connection.beginTransaction((err) => {
+    connection.beginTransaction((err,results) => {
       if (err) {
         console.error('Transaction error:', err);
         return res.status(500).json({ error: 'Transaction initialization failed' });
+      }else{
+        console.log(results);
       }
+
 
       // Deduct the balance from the wallet
       const deductBalanceQuery = `
         UPDATE wallet
         SET balance = balance - ?
-        WHERE userId = ? AND cryptoname = ? AND balance >= ?
+        WHERE userId = ? AND cryptoname = ? 
       `;
-      connection.query(
+      const response = connection.query(
         deductBalanceQuery,
         [balance, userId, cryptoname, balance],
         (err, results) => {
@@ -34,6 +41,7 @@ router.post('/withdrawl', async (req, res) => {
               res.status(500).json({ error: 'Error updating wallet balance' });
             });
           }
+          
 
           if (results.affectedRows === 0) {
             return connection.rollback(() => {
@@ -124,7 +132,8 @@ router.get('/withdrawl/:id', async (req, res) => {
   }
 });
 
-// Update a withdrawal entry by ID
+
+
 // Update a withdrawal entry by ID
 router.put('/withdrawl/:id', async (req, res) => {
   const withdrawlId = req.params.id;
