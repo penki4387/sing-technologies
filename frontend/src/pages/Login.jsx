@@ -16,39 +16,24 @@ const Login = () => {
     };
     sessionStorage.setItem(key, JSON.stringify(item));
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(USER_LOGIN, {
-        email,
-        password,
-      });
-
+      const response = await axios.post(USER_LOGIN, { email, password });
       const { token, user, wallet } = response.data;
 
-      console.log("Token:", token);
-      console.log("User:", user);
-      console.log("Wallet:", wallet);
-      console.log('fundingWallet:', user.fundingWallet);
-      console.log('supportWallet:', user.supportWallet);
-
-
       const twoHoursInMs = 2 * 60 * 60 * 1000; // Two hours in milliseconds
-
-      // Save token and user data to sessionStorage
       setWithExpiry('usertoken', token, twoHoursInMs);
       sessionStorage.setItem('username', user.username);
       sessionStorage.setItem('email', user.email);
       sessionStorage.setItem('fundingWallet', user.fundingWallet);
       sessionStorage.setItem('supportWallet', user.supportWallet);
       sessionStorage.setItem('userId', user.id);
-
-      // Store wallet data in sessionStorage
       sessionStorage.setItem('wallet', JSON.stringify(wallet));
 
       alert('Login successful!');
-      navigate('/dashboard'); // Redirect to dashboard or home page
+      navigate('/dashboard');
     } catch (error) {
       console.error(error);
       alert('Invalid credentials');
@@ -56,18 +41,26 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "rgba(21,49,32,255)" }}>
+    <div
+      className="min-h-screen flex items-center justify-center p-4"
+      style={{
+        backgroundColor: 'rgba(21,49,32,255)',
+        backgroundImage: 'none', // Ensure no heavy background images
+      }}
+    >
       <form
         className="w-full max-w-sm bg-white p-6 rounded-lg shadow-md"
         onSubmit={handleSubmit}
       >
-        <h2 className="text-2xl font-semibold text-center mb-6">User Login</h2>
+        {/* Using h1 for main heading to prioritize LCP */}
+        <h1 className="text-2xl font-bold text-center mb-6">User Login</h1>
         <input
           type="email"
           placeholder="Email"
           className="w-full p-3 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
         />
         <input
           type="password"
@@ -75,6 +68,7 @@ const Login = () => {
           className="w-full p-3 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
         <button
           type="submit"
@@ -82,8 +76,11 @@ const Login = () => {
         >
           Login
         </button>
-        <p>
-          Don't have an account? <Link to="/register">Register</Link>
+        <p className="text-center text-gray-600 mt-4">
+          Don't have an account?{' '}
+          <Link to="/register" className="text-blue-500 hover:underline">
+            Register
+          </Link>
         </p>
       </form>
     </div>

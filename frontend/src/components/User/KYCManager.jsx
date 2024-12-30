@@ -20,16 +20,11 @@ const KYCManager = () => {
   const fetchKYCDetails = async () => {
     try {
       const response = await axios.get(GET_USER_BY_ID(userId));
-      
       const { aadhar, pan } = response.data;
-      
+
       setKYCDetails({
-        aadharImage: aadhar
-          ? `${BASE_URL}/uploads/${aadhar}`
-          : null,
-        panImage: pan
-          ? `${BASE_URL}/uploads/${pan}`
-          : null,
+        aadharImage: aadhar ? `${BASE_URL}/uploads/${aadhar}` : null,
+        panImage: pan ? `${BASE_URL}/uploads/${pan}` : null,
       });
       setLoading(false);
     } catch (error) {
@@ -59,25 +54,25 @@ const KYCManager = () => {
       });
       setMessage("KYC details updated successfully.");
       setTimeout(() => {
-        setMessage('')
-      },3000);
+        setMessage("");
+      }, 3000);
       fetchKYCDetails();
     } catch (error) {
       console.error("Error updating KYC details:", error);
       setMessage("Error updating KYC details.");
       setTimeout(() => {
-        setMessage('')
-      },3000);
+        setMessage("");
+      }, 3000);
     }
   };
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-gray-100 rounded shadow">
-      <h1 className="text-2xl font-bold text-center mb-4">KYC Image Upload</h1>
+      <h1 className="text-xl lg:text-2xl font-bold text-center mb-4">KYC Image Upload</h1>
       {loading ? (
-        <p>Loading...</p>
+        <p className="text-center">Loading...</p>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Aadhar Image */}
           <div>
             <label className="block mb-1 font-medium">Upload Aadhar Image</label>
@@ -90,14 +85,15 @@ const KYCManager = () => {
             />
             {kycDetails.aadharImage && (
               <img
-              
                 src={
                   kycDetails.aadharImage instanceof File
                     ? URL.createObjectURL(kycDetails.aadharImage)
                     : kycDetails.aadharImage
                 }
                 alt="Aadhar Preview"
-                className="mt-2 h-20 w-20 object-cover rounded"
+                className="mt-2 object-cover rounded"
+                loading="lazy"
+                style={{ width: "auto", height: "auto", maxWidth: "100px", maxHeight: "100px" }}
               />
             )}
           </div>
@@ -120,7 +116,9 @@ const KYCManager = () => {
                     : kycDetails.panImage
                 }
                 alt="PAN Preview"
-                className="mt-2 h-20 w-20 object-cover rounded"
+                className="mt-2 object-cover rounded"
+                loading="lazy"
+                style={{ width: "auto", height: "auto", maxWidth: "100px", maxHeight: "100px" }}
               />
             )}
           </div>
@@ -128,7 +126,7 @@ const KYCManager = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+            className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition"
           >
             Update KYC
           </button>
