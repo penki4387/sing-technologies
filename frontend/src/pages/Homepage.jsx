@@ -6,6 +6,7 @@ import UserSettings from "../components/User/UserSettings";
 import KYCManager from "../components/User/KYCManager";
 import GamesComponent from "../components/User/GamesComponent";
 import "../components/User/UserDashboard.css";
+import ColorGamesComponent from "../components/User/ColorGamesComponent";
 
 const Homepage = () => {
   const [activeComponent, setActiveComponent] = useState("dashboard");
@@ -25,7 +26,7 @@ const Homepage = () => {
       case "games":
         switch (selectedGame) {
           case "gameTypeA":
-            return <div>Game Type A Content</div>;
+            return <ColorGamesComponent/>;
           case "gameTypeB":
             return <GamesComponent />;
           default:

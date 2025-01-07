@@ -1,5 +1,6 @@
 
-import { BASE_URL } from "./config";
+// import { BASE_URL } from "./config";
+  const BASE_URL ="http://localhost:3000"
 //Games
 export const GET_ALL_GAMES = `${BASE_URL}/api/games/allgames`;
 export const GET_GAME_BY_ID = (id) => `${BASE_URL}/api/games/game/${id}`;
