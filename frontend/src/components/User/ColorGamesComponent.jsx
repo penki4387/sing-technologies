@@ -1,37 +1,46 @@
 import React, { useState, useEffect } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import PopupComponent from "./PopUpComponent"; // Import the popup
 
 const ColorGamesComponent = () => {
-  const [timeLeft, setTimeLeft] = useState(60); // 1 minute countdown
-  const [randomNumber, setRandomNumber] = useState(
-    Math.floor(Math.random() * 10000000000)
-  ); // Random number for Period
-  const [activeTable, setActiveTable] = useState("Parity"); // Default active table
+  const [timeLeft, setTimeLeft] = useState({
+    "1min": 60,
+    "3min": 180,
+    "5min": 300,
+    "10min": 600,
+  }); // Timer for each table
+  const [isDisabled, setIsDisabled] = useState({
+    "1min": false,
+    "3min": false,
+    "5min": false,
+    "10min": false,
+  });
+  
+  const [activeTable, setActiveTable] = useState("1min");
   const [currentPage, setCurrentPage] = useState(1); // Current page for pagination
-  const [isDisabled, setIsDisabled] = useState(false); // Track if action buttons should be disabled
-  const [period, setPeriod] = useState("20250103701"); // Set an initial period
+  const [period, setPeriod] = useState("202501088594"); // Set an initial period
   const [saturation, setSaturation] = useState(1); // Variable for table saturation effect
 
   const tableData = {
-    Parity: Array.from({ length: 20 }, (_, i) => ({
+    "1min": Array.from({ length: 20 }, (_, i) => ({
       period: `202501037${38 - i}`,
       price: `${37000 + i * 10}`,
       number: i % 10,
       result: i % 2 === 0 ? "green" : "red",
     })),
-    Sapre: Array.from({ length: 20 }, (_, i) => ({
+    "3min": Array.from({ length: 20 }, (_, i) => ({
       period: `202501037${18 - i}`,
       price: `${38000 + i * 15}`,
       number: (i + 1) % 10,
       result: (i + 1) % 2 === 0 ? "green" : "red",
     })),
-    Bcone: Array.from({ length: 20 }, (_, i) => ({
+    "5min": Array.from({ length: 20 }, (_, i) => ({
       period: `202501037${58 - i}`,
       price: `${39000 + i * 20}`,
       number: (i + 2) % 10,
       result: (i + 2) % 2 === 0 ? "green" : "red",
     })),
-    Emred: Array.from({ length: 20 }, (_, i) => ({
+    "10min": Array.from({ length: 20 }, (_, i) => ({
       period: `202501037${78 - i}`,
       price: `${40000 + i * 25}`,
       number: (i + 3) % 10,
@@ -66,43 +75,122 @@ const ColorGamesComponent = () => {
   );
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 0) return 60; // Reset Timer after 1 minute
-        return prev - 1;
+    const interval = setInterval(() => {
+      setTimeLeft((prevTimeLeft) => {
+        const newTimeLeft = { ...prevTimeLeft };
+  
+        if (newTimeLeft["1min"] === 0) {
+          newTimeLeft["1min"] = 60;
+        } else {
+          newTimeLeft["1min"] -= 1;
+        }
+  
+        return newTimeLeft;
+      });
+    }, 1000);
+  
+    return () => clearInterval(interval);
+  }, []);
+  
+  // Disable buttons and change color for the 1min table only after 30 seconds
+  useEffect(() => {
+    if (timeLeft["1min"] === 30) {
+      setIsDisabled((prev) => ({ ...prev, "1min": true })); // Disable 1min buttons
+    } else if (timeLeft["1min"] === 60) {
+      setIsDisabled((prev) => ({ ...prev, "1min": false })); // Re-enable 1min buttons
+    }
+  }, [timeLeft["1min"]]);
+  
+  // Repeat similar logic for the 3min, 5min, and 10min tables if necessary
+  
+
+  // Timer logic for 3min table
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeLeft((prevTimeLeft) => {
+        const newTimeLeft = { ...prevTimeLeft };
+
+        if (newTimeLeft["3min"] === 0) {
+          // Reset to 180 seconds when time reaches 0
+          newTimeLeft["3min"] = 180;
+        } else {
+          newTimeLeft["3min"] -= 1;
+        }
+
+        return newTimeLeft;
       });
     }, 1000);
 
-    // Disable action buttons after 50 seconds (10 seconds left in the cycle)
-    if (timeLeft === 20) {
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, []); // Only run on mount
+
+  // Timer logic for 5min table
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeLeft((prevTimeLeft) => {
+        const newTimeLeft = { ...prevTimeLeft };
+
+        if (newTimeLeft["5min"] === 0) {
+          // Reset to 300 seconds when time reaches 0
+          newTimeLeft["5min"] = 300;
+        } else {
+          newTimeLeft["5min"] -= 1;
+        }
+
+        return newTimeLeft;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, []); // Only run on mount
+
+  // Timer logic for 10min table
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeLeft((prevTimeLeft) => {
+        const newTimeLeft = { ...prevTimeLeft };
+
+        if (newTimeLeft["10min"] === 0) {
+          // Reset to 600 seconds when time reaches 0
+          newTimeLeft["10min"] = 600;
+        } else {
+          newTimeLeft["10min"] -= 1;
+        }
+
+        return newTimeLeft;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, []); // Only run on mount
+
+
+  // Synchronized Period and Button State Update
+  useEffect(() => {
+    if (timeLeft[activeTable] === 0) {
+      const currentDate = new Date();
+      const year = currentDate.getFullYear();
+      const month = (currentDate.getMonth() + 1).toString().padStart(2, "0"); // Month is 0-indexed
+      const day = currentDate.getDate().toString().padStart(2, "0");
+      const randomLast4 = Math.floor(Math.random() * 10000); // Random last 4 digits
+      setPeriod(`${year}${month}${day}${randomLast4}`); // Format: YYYYMMDD + last 4 random digits
       setIsDisabled(true);
     }
 
-    // Re-enable buttons and reset after 1 minute
-    if (timeLeft === 60) {
-      setIsDisabled(false);
+    if (timeLeft[activeTable] === 60) {
+      setIsDisabled(false); // Re-enable buttons after the full cycle
     }
-
-    return () => clearInterval(timer);
-  }, [timeLeft]);
-
-  // Period change after 1 minute
-  useEffect(() => {
-    if (timeLeft === 0) {
-      // Change the period after 1 minute (60 seconds)
-      setPeriod(`202501037${Math.floor(Math.random() * 100000)}`); // Update with a random period
-    }
-  }, [timeLeft]);
+  }, [timeLeft, activeTable]);
 
   // Decrease saturation after 10 seconds
   useEffect(() => {
-    if (timeLeft === 20) {
-      setSaturation(0.5); // Decrease saturation (or any other effect you want) after 10 seconds
+    if (timeLeft[activeTable] === 20) {
+      setSaturation(0.5); // Decrease saturation after 10 seconds
     }
-    if (timeLeft === 60) {
+    if (timeLeft[activeTable] === 60) {
       setSaturation(1); // Reset saturation after a full cycle
     }
-  }, [timeLeft]);
+  }, [timeLeft, activeTable]);
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -116,7 +204,7 @@ const ColorGamesComponent = () => {
     <div className="min-h-screen text-white flex flex-col items-center p-4">
       {/* Top Row - Table Selection */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full max-w-5xl mb-6">
-        {["Parity", "Sapre", "Bcone", "Emred"].map((tableName) => (
+        {["1min", "3min", "5min", "10min"].map((tableName) => (
           <button
             key={tableName}
             className={`px-2 py-1 rounded text-white ${
@@ -126,21 +214,12 @@ const ColorGamesComponent = () => {
               setActiveTable(tableName);
               setCurrentPage(1);
             }}
-            disabled={
-              isDisabled &&
-              !(
-                tableName === "Parity" ||
-                tableName === "Sapre" ||
-                tableName === "Bcone" ||
-                tableName === "Emred"
-              )
-            }
           >
             {tableName}
           </button>
         ))}
       </div>
-
+  
       {/* Timer & Period */}
       <div className="flex flex-col sm:flex-row justify-between items-center w-full max-w-5xl mb-6">
         <div className="flex items-center mb-2 sm:mb-0">
@@ -149,16 +228,16 @@ const ColorGamesComponent = () => {
           <span className="text-lg font-bold">{period}</span>
         </div>
         <span className="bg-gray-700 px-4 py-2 rounded">
-          Time Left: {formatTime(timeLeft)}
+          Time Left: {formatTime(timeLeft[activeTable])}
         </span>
       </div>
-
-      {/* Action Buttons */}
+  
+      {/* Join Buttons */}
       <div className="grid grid-cols-3 sm:grid-cols-3 gap-4 w-full max-w-5xl mb-6">
         <button
           className="px-2 py-1 rounded text-white"
           style={{
-            background: isDisabled ? "rgb(149,53,83)" : "#10B981", // Change to rgb(149,53,83) after 50 seconds
+            background: isDisabled ? "rgb(169, 169, 169)" : "#10B981",
           }}
           disabled={isDisabled}
         >
@@ -167,7 +246,7 @@ const ColorGamesComponent = () => {
         <button
           className="px-2 py-1 rounded text-white"
           style={{
-            background: isDisabled ? "rgb(149,53,83)" : "#8b5cf6", // Change to rgb(149,53,83) after 50 seconds
+            background: isDisabled ? "rgb(169, 169, 169)" : "#8b5cf6",
           }}
           disabled={isDisabled}
         >
@@ -176,65 +255,68 @@ const ColorGamesComponent = () => {
         <button
           className="px-2 py-1 rounded text-white"
           style={{
-            background: isDisabled ? "rgb(149,53,83)" : "#EF4444", // Change to rgb(149,53,83) after 50 seconds
+            background: isDisabled ? "rgb(169, 169, 169)" : "#EF4444",
           }}
           disabled={isDisabled}
         >
           Join Red
         </button>
       </div>
-      
+  
+      {/* Number Buttons */}
       <div className="grid grid-cols-5 sm:grid-cols-5 gap-2 w-full max-w-5xl mb-6">
-  {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((num, index) => (
-    <button
-      key={index}
-      className="px-2 py-1 rounded text-white w-full"
-      style={
-        isDisabled
-          ? { background: "rgb(149,53,83)" } // Disabled color
-          : index === 0
-          ? {
-              background:
-                "linear-gradient(135deg, #ef4444 50%, #8b5cf6 50%)",
-            } // Mixed Red & Purple for 0
-          : index === 5
-          ? {
-              background:
-                "linear-gradient(135deg, #10B981 50%, #8b5cf6 50%)",
-            } // Mixed Green & Purple for 5
-          : num % 2 === 0
-          ? { background: "#10B981" } // Green for even numbers
-          : { background: "#EF4444" } // Red for odd numbers
-      }
-      disabled={isDisabled}
-    >
-      {num}
-    </button>
-  ))}
-
-  {/* Row for Big and Small Buttons */}
-  <div className="col-span-5 flex gap-2 w-full">
-    {/* Big Button */}
-    <button
-      className="px-4 py-1 text-xl rounded text-white w-full"
-      style={{ background: isDisabled ? "rgb(149,53,83)" : "#EF4444" }} // Red color
-      disabled={isDisabled}
-    >
-      Big
-    </button>
-
-    {/* Small Button */}
-    <button
-      className="px-4 py-1 text-xl rounded text-white w-full"
-      style={{ background: isDisabled ? "rgb(149,53,83)" : "#10B981" }} // Green color
-      disabled={isDisabled}
-    >
-      Small
-    </button>
-  </div>
-</div>
-
-
+        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((num, index) => {
+          let backgroundColor = "rgb(169, 169, 169)"; // Default to gray if disabled
+          if (!isDisabled) {
+            if (index === 0) {
+              backgroundColor = "linear-gradient(135deg, #ef4444 50%, #8b5cf6 50%)";
+            } else if (index === 5) {
+              backgroundColor = "linear-gradient(135deg, #10B981 50%, #8b5cf6 50%)";
+            } else if (num % 2 === 0) {
+              backgroundColor = "#10B981"; // Green for even numbers
+            } else {
+              backgroundColor = "#EF4444"; // Red for odd numbers
+            }
+          }
+  
+          return (
+            <button
+              key={index}
+              className="px-2 py-1 rounded text-white w-full"
+              style={{ background: backgroundColor }}
+              disabled={isDisabled}
+            >
+              {num}
+            </button>
+          );
+        })}
+  
+        {/* Row for Big and Small Buttons */}
+        <div className="col-span-5 flex gap-2 w-full">
+          {/* Big Button */}
+          <button
+            className="px-4 py-1 text-xl rounded text-white w-full"
+            style={{
+              background: isDisabled ? "rgb(169, 169, 169)" : "#EF4444",
+            }}
+            disabled={isDisabled}
+          >
+            Big
+          </button>
+  
+          {/* Small Button */}
+          <button
+            className="px-4 py-1 text-xl rounded text-white w-full"
+            style={{
+              background: isDisabled ? "rgb(169, 169, 169)" : "#10B981",
+            }}
+            disabled={isDisabled}
+          >
+            Small
+          </button>
+        </div>
+      </div>
+  
       {/* Table */}
       <div className="w-full max-w-5xl">
         <h2 className="text-lg font-bold mb-2 flex justify-center items-center gap-2">
@@ -248,7 +330,7 @@ const ColorGamesComponent = () => {
               <th className="px-4 py-2">Price</th>
               <th className="px-4 py-2">Number</th>
               <th className="px-4 py-2">Result</th>
-              <th className="px-4 py-2">Small & Big</th> {/* New Column */}
+              <th className="px-4 py-2">Small & Big</th>
             </tr>
           </thead>
           <tbody>
@@ -266,7 +348,7 @@ const ColorGamesComponent = () => {
                           width: "20px",
                           height: "20px",
                           borderRadius: "50%",
-                          backgroundColor: "#8b5cf6", // Violet
+                          backgroundColor: "#8b5cf6",
                         }}
                       ></span>
                       <span> + </span>
@@ -276,7 +358,7 @@ const ColorGamesComponent = () => {
                           width: "20px",
                           height: "20px",
                           borderRadius: "50%",
-                          backgroundColor: "#EF4444", // Red
+                          backgroundColor: "#EF4444",
                         }}
                       ></span>
                     </>
@@ -288,7 +370,7 @@ const ColorGamesComponent = () => {
                           width: "20px",
                           height: "20px",
                           borderRadius: "50%",
-                          backgroundColor: "#8b5cf6", // Violet
+                          backgroundColor: "#10B981",
                         }}
                       ></span>
                       <span> + </span>
@@ -298,7 +380,7 @@ const ColorGamesComponent = () => {
                           width: "20px",
                           height: "20px",
                           borderRadius: "50%",
-                          backgroundColor: "#10B981", // Green
+                          backgroundColor: "#8b5cf6",
                         }}
                       ></span>
                     </>
@@ -309,7 +391,7 @@ const ColorGamesComponent = () => {
                         width: "20px",
                         height: "20px",
                         borderRadius: "50%",
-                        backgroundColor: "#10B981", // Green
+                        backgroundColor: "#10B981",
                       }}
                     ></span>
                   ) : (
@@ -319,24 +401,20 @@ const ColorGamesComponent = () => {
                         width: "20px",
                         height: "20px",
                         borderRadius: "50%",
-                        backgroundColor: "#EF4444", // Red
+                        backgroundColor: "#EF4444",
                       }}
                     ></span>
                   )}
                 </td>
-                <td className="px-4 py-2 font-bold">
-                  {row.number < 5 ? (
-                    <span style={{ color: "#10B981" }}>Small</span> // Green for Small
-                  ) : (
-                    <span style={{ color: "#EF4444" }}>Big</span> // Red for Big
-                  )}
+                <td className="px-4 py-2">
+                  {row.number % 2 === 0 ? "Small" : "Big"}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-
-        {/* Pagination Controls */}
+  
+        {/* Pagination */}
         <div className="flex justify-center items-center gap-4">
           <button
             className="px-4 py-2 bg-gray-700 text-white rounded"
@@ -345,8 +423,7 @@ const ColorGamesComponent = () => {
           >
             <FaChevronLeft />
           </button>
-
-          {/* Page Numbers */}
+  
           {[...Array(totalPages)].map((_, idx) => (
             <button
               key={idx}
@@ -360,7 +437,7 @@ const ColorGamesComponent = () => {
               {idx + 1}
             </button>
           ))}
-
+  
           <button
             className="px-4 py-2 bg-gray-700 text-white rounded"
             onClick={handleNextPage}
@@ -372,6 +449,8 @@ const ColorGamesComponent = () => {
       </div>
     </div>
   );
+  
+  
 };
 
 export default ColorGamesComponent;
