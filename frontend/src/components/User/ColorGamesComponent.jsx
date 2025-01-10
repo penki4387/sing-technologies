@@ -15,7 +15,12 @@ const ColorGamesComponent = () => {
     "5min": false,
     "10min": false,
   });
-  
+   const [periods, setPeriods] = useState({
+    "1min": "202501088594", // initial period for 1min table
+    "3min": "202501088595", // initial period for 3min table
+    "5min": "202501088596", // initial period for 5min table
+    "10min": "202501088597", // initial period for 10min table
+  });
   const [activeTable, setActiveTable] = useState("1min");
   const [currentPage, setCurrentPage] = useState(1); // Current page for pagination
   const [period, setPeriod] = useState("202501088594"); // Set an initial period
@@ -74,113 +79,225 @@ const ColorGamesComponent = () => {
     currentPage * recordsPerPage
   );
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeLeft((prevTimeLeft) => {
-        const newTimeLeft = { ...prevTimeLeft };
-  
-        if (newTimeLeft["1min"] === 0) {
-          newTimeLeft["1min"] = 60;
-        } else {
-          newTimeLeft["1min"] -= 1;
-        }
-  
-        return newTimeLeft;
-      });
-    }, 1000);
-  
-    return () => clearInterval(interval);
-  }, []);
-  
   // Disable buttons and change color for the 1min table only after 30 seconds
   useEffect(() => {
-    if (timeLeft["1min"] === 30) {
+    if (timeLeft["1min"] === 10) {
       setIsDisabled((prev) => ({ ...prev, "1min": true })); // Disable 1min buttons
     } else if (timeLeft["1min"] === 60) {
       setIsDisabled((prev) => ({ ...prev, "1min": false })); // Re-enable 1min buttons
     }
   }, [timeLeft["1min"]]);
   
-  // Repeat similar logic for the 3min, 5min, and 10min tables if necessary
+  useEffect(() => {
+    if (timeLeft["3min"] === 10) {
+      setIsDisabled((prev) => ({ ...prev, "3min": true })); // Disable 3min buttons
+    } else if (timeLeft["3min"] === 180) {
+      setIsDisabled((prev) => ({ ...prev, "3min": false })); // Re-enable 3min buttons
+    }
+  }, [timeLeft["3min"]]);
   
-
+  useEffect(() => {
+    if (timeLeft["5min"] === 10) {
+      setIsDisabled((prev) => ({ ...prev, "5min": true })); // Disable 5min buttons
+    } else if (timeLeft["5min"] === 300) {
+      setIsDisabled((prev) => ({ ...prev, "5min": false })); // Re-enable 3min buttons
+    }
+  }, [timeLeft["5min"]]);
   // Timer logic for 3min table
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeLeft((prevTimeLeft) => {
-        const newTimeLeft = { ...prevTimeLeft };
+    if (timeLeft["10min"] === 10) {
+      setIsDisabled((prev) => ({ ...prev, "10min": true })); // Disable 10min buttons
+    } else if (timeLeft["10min"] === 600) {
+      setIsDisabled((prev) => ({ ...prev, "10min": false })); // Re-enable 3min buttons
+    }
+  }, [timeLeft["10min"]]);
 
-        if (newTimeLeft["3min"] === 0) {
-          // Reset to 180 seconds when time reaches 0
-          newTimeLeft["3min"] = 180;
-        } else {
-          newTimeLeft["3min"] -= 1;
-        }
+// Function to generate a new period with random last 4 digits
+const generateNewPeriod = (tableName) => {
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = (currentDate.getMonth() + 1).toString().padStart(2, "0");
+  const day = currentDate.getDate().toString().padStart(2, "0");
+  const randomLast4 = Math.floor(1000 + Math.random() * 9000); // Ensure 4-digit random number
+  return `${year}${month}${day}${randomLast4}`;
+};
 
-        return newTimeLeft;
-      });
-    }, 1000);
+// Timer for 1min table
+useEffect(() => {
+  const interval = setInterval(() => {
+    setTimeLeft((prevTimeLeft) => {
+      const newTimeLeft = { ...prevTimeLeft };
 
-    return () => clearInterval(interval); // Cleanup on unmount
-  }, []); // Only run on mount
+      if (newTimeLeft["1min"] === 0) {
+        newTimeLeft["1min"] = 60;
+        setPeriods((prev) => ({ ...prev, "1min": generateNewPeriod("1min") })); // Update period
+      } else {
+        newTimeLeft["1min"] -= 1;
+      }
 
-  // Timer logic for 5min table
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeLeft((prevTimeLeft) => {
-        const newTimeLeft = { ...prevTimeLeft };
+      return newTimeLeft;
+    });
+  }, 1000);
 
-        if (newTimeLeft["5min"] === 0) {
-          // Reset to 300 seconds when time reaches 0
-          newTimeLeft["5min"] = 300;
-        } else {
-          newTimeLeft["5min"] -= 1;
-        }
+  return () => clearInterval(interval);
+}, []);
 
-        return newTimeLeft;
-      });
-    }, 1000);
+// Timer for 3min table
+useEffect(() => {
+  const interval = setInterval(() => {
+    setTimeLeft((prevTimeLeft) => {
+      const newTimeLeft = { ...prevTimeLeft };
 
-    return () => clearInterval(interval); // Cleanup on unmount
-  }, []); // Only run on mount
+      if (newTimeLeft["3min"] === 0) {
+        newTimeLeft["3min"] = 180;
+        setPeriods((prev) => ({ ...prev, "3min": generateNewPeriod("3min") })); // Update period
+      } else {
+        newTimeLeft["3min"] -= 1;
+      }
 
-  // Timer logic for 10min table
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeLeft((prevTimeLeft) => {
-        const newTimeLeft = { ...prevTimeLeft };
+      return newTimeLeft;
+    });
+  }, 1000);
 
-        if (newTimeLeft["10min"] === 0) {
-          // Reset to 600 seconds when time reaches 0
-          newTimeLeft["10min"] = 600;
-        } else {
-          newTimeLeft["10min"] -= 1;
-        }
+  return () => clearInterval(interval);
+}, []);
 
-        return newTimeLeft;
-      });
-    }, 1000);
+// Timer for 5min table
+useEffect(() => {
+  const interval = setInterval(() => {
+    setTimeLeft((prevTimeLeft) => {
+      const newTimeLeft = { ...prevTimeLeft };
 
-    return () => clearInterval(interval); // Cleanup on unmount
-  }, []); // Only run on mount
+      if (newTimeLeft["5min"] === 0) {
+        newTimeLeft["5min"] = 300;
+        setPeriods((prev) => ({ ...prev, "5min": generateNewPeriod("5min") })); // Update period
+      } else {
+        newTimeLeft["5min"] -= 1;
+      }
+
+      return newTimeLeft;
+    });
+  }, 1000);
+
+  return () => clearInterval(interval);
+}, []);
+
+// Timer for 10min table
+useEffect(() => {
+  const interval = setInterval(() => {
+    setTimeLeft((prevTimeLeft) => {
+      const newTimeLeft = { ...prevTimeLeft };
+
+      if (newTimeLeft["10min"] === 0) {
+        newTimeLeft["10min"] = 600;
+        setPeriods((prev) => ({ ...prev, "10min": generateNewPeriod("10min") })); // Update period
+      } else {
+        newTimeLeft["10min"] -= 1;
+      }
+
+      return newTimeLeft;
+    });
+  }, 1000);
+
+  return () => clearInterval(interval);
+}, []);
+
+  // //1min table
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setTimeLeft((prevTimeLeft) => {
+  //       const newTimeLeft = { ...prevTimeLeft };
+  
+  //       if (newTimeLeft["1min"] === 0) {
+  //         newTimeLeft["1min"] = 60;
+  //       } else {
+  //         newTimeLeft["1min"] -= 1;
+  //       }
+  
+  //       return newTimeLeft;
+  //     });
+  //   }, 1000);
+  
+  //   return () => clearInterval(interval);
+  // }, []);
+  
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setTimeLeft((prevTimeLeft) => {
+  //       const newTimeLeft = { ...prevTimeLeft };
+
+  //       if (newTimeLeft["3min"] === 0) {
+  //         // Reset to 180 seconds when time reaches 0
+  //         newTimeLeft["3min"] = 180;
+  //       } else {
+  //         newTimeLeft["3min"] -= 1;
+  //       }
+
+  //       return newTimeLeft;
+  //     });
+  //   }, 1000);
+
+  //   return () => clearInterval(interval); // Cleanup on unmount
+  // }, []); // Only run on mount
+
+  // // Timer logic for 5min table
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setTimeLeft((prevTimeLeft) => {
+  //       const newTimeLeft = { ...prevTimeLeft };
+
+  //       if (newTimeLeft["5min"] === 0) {
+  //         // Reset to 300 seconds when time reaches 0
+  //         newTimeLeft["5min"] = 300;
+  //       } else {
+  //         newTimeLeft["5min"] -= 1;
+  //       }
+
+  //       return newTimeLeft;
+  //     });
+  //   }, 1000);
+
+  //   return () => clearInterval(interval); // Cleanup on unmount
+  // }, []); // Only run on mount
+
+  // // Timer logic for 10min table
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setTimeLeft((prevTimeLeft) => {
+  //       const newTimeLeft = { ...prevTimeLeft };
+
+  //       if (newTimeLeft["10min"] === 0) {
+  //         // Reset to 600 seconds when time reaches 0
+  //         newTimeLeft["10min"] = 600;
+  //       } else {
+  //         newTimeLeft["10min"] -= 1;
+  //       }
+
+  //       return newTimeLeft;
+  //     });
+  //   }, 1000);
+
+  //   return () => clearInterval(interval); // Cleanup on unmount
+  // }, []); // Only run on mount
 
 
+  
   // Synchronized Period and Button State Update
-  useEffect(() => {
-    if (timeLeft[activeTable] === 0) {
-      const currentDate = new Date();
-      const year = currentDate.getFullYear();
-      const month = (currentDate.getMonth() + 1).toString().padStart(2, "0"); // Month is 0-indexed
-      const day = currentDate.getDate().toString().padStart(2, "0");
-      const randomLast4 = Math.floor(Math.random() * 10000); // Random last 4 digits
-      setPeriod(`${year}${month}${day}${randomLast4}`); // Format: YYYYMMDD + last 4 random digits
-      setIsDisabled(true);
-    }
+  // useEffect(() => {
+  //   if (timeLeft[activeTable] === 0) {
+  //     const currentDate = new Date();
+  //     const year = currentDate.getFullYear();
+  //     const month = (currentDate.getMonth() + 1).toString().padStart(2, "0"); // Month is 0-indexed
+  //     const day = currentDate.getDate().toString().padStart(2, "0");
+  //     const randomLast4 = Math.floor(Math.random() * 10000); // Random last 4 digits
+  //     setPeriod(`${year}${month}${day}${randomLast4}`); // Format: YYYYMMDD + last 4 random digits
+  //     setIsDisabled(true); 
+  //   }
 
-    if (timeLeft[activeTable] === 60) {
-      setIsDisabled(false); // Re-enable buttons after the full cycle
-    }
-  }, [timeLeft, activeTable]);
+  //   if (timeLeft[activeTable] === 60) {
+  //     setIsDisabled(false); // Re-enable buttons after the full cycle
+  //   }
+  // }, [timeLeft, activeTable]);
 
   // Decrease saturation after 10 seconds
   useEffect(() => {
@@ -225,7 +342,7 @@ const ColorGamesComponent = () => {
         <div className="flex items-center mb-2 sm:mb-0">
           <span className="text-green-500 font-bold text-xl">🏆</span>
           <span className="text-lg font-bold mx-2">Period</span>
-          <span className="text-lg font-bold">{period}</span>
+          <span className="text-lg font-bold">{periods[activeTable]}</span>
         </div>
         <span className="bg-gray-700 px-4 py-2 rounded">
           Time Left: {formatTime(timeLeft[activeTable])}
@@ -237,27 +354,27 @@ const ColorGamesComponent = () => {
         <button
           className="px-2 py-1 rounded text-white"
           style={{
-            background: isDisabled ? "rgb(169, 169, 169)" : "#10B981",
+            background: isDisabled[activeTable] ? "rgb(169, 169, 169)" : "#10B981",
           }}
-          disabled={isDisabled}
+          disabled={isDisabled[activeTable]}
         >
           Join Green
         </button>
         <button
           className="px-2 py-1 rounded text-white"
           style={{
-            background: isDisabled ? "rgb(169, 169, 169)" : "#8b5cf6",
+            background: isDisabled[activeTable] ? "rgb(169, 169, 169)" : "#8b5cf6",
           }}
-          disabled={isDisabled}
+          disabled={isDisabled[activeTable]}
         >
           Join Violet
         </button>
         <button
           className="px-2 py-1 rounded text-white"
           style={{
-            background: isDisabled ? "rgb(169, 169, 169)" : "#EF4444",
+            background: isDisabled[activeTable] ? "rgb(169, 169, 169)" : "#EF4444",
           }}
-          disabled={isDisabled}
+          disabled={isDisabled[activeTable]}
         >
           Join Red
         </button>
@@ -267,7 +384,7 @@ const ColorGamesComponent = () => {
       <div className="grid grid-cols-5 sm:grid-cols-5 gap-2 w-full max-w-5xl mb-6">
         {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((num, index) => {
           let backgroundColor = "rgb(169, 169, 169)"; // Default to gray if disabled
-          if (!isDisabled) {
+          if (!isDisabled[activeTable]) {
             if (index === 0) {
               backgroundColor = "linear-gradient(135deg, #ef4444 50%, #8b5cf6 50%)";
             } else if (index === 5) {
@@ -284,7 +401,7 @@ const ColorGamesComponent = () => {
               key={index}
               className="px-2 py-1 rounded text-white w-full"
               style={{ background: backgroundColor }}
-              disabled={isDisabled}
+              disabled={isDisabled[activeTable]}
             >
               {num}
             </button>
@@ -297,9 +414,9 @@ const ColorGamesComponent = () => {
           <button
             className="px-4 py-1 text-xl rounded text-white w-full"
             style={{
-              background: isDisabled ? "rgb(169, 169, 169)" : "#EF4444",
+              background: isDisabled[activeTable] ? "rgb(169, 169, 169)" : "#EF4444",
             }}
-            disabled={isDisabled}
+            disabled={isDisabled[activeTable]}
           >
             Big
           </button>
@@ -308,9 +425,9 @@ const ColorGamesComponent = () => {
           <button
             className="px-4 py-1 text-xl rounded text-white w-full"
             style={{
-              background: isDisabled ? "rgb(169, 169, 169)" : "#10B981",
+              background: isDisabled[activeTable] ? "rgb(169, 169, 169)" : "#10B981",
             }}
-            disabled={isDisabled}
+            disabled={isDisabled[activeTable]}
           >
             Small
           </button>

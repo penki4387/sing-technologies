@@ -1,88 +1,130 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
-const ColorGamePopup = ({ walletBalance, onClose, onConfirm }) => {
+const PopupComponent = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const [selectedAmount, setSelectedAmount] = useState(10);
   const [quantity, setQuantity] = useState(1);
-  const [isAgreed, setIsAgreed] = useState(false);
+  const [balance, setBalance] = useState(50); // Example balance
+  const [isChecked, setIsChecked] = useState(false);
+
+  const togglePopup = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleAmountClick = (amount) => {
+    setSelectedAmount(amount);
+  };
+
+  const handleQuantityChange = (type) => {
+    if (type === "increment") {
+      setQuantity(quantity + 1);
+    } else if (type === "decrement" && quantity > 1) {
+      setQuantity(quantity - 1);
+    }
+  };
+
+  const handleCheckboxChange = () => {
+    setIsChecked(!isChecked);
+  };
 
   const totalContractMoney = selectedAmount * quantity;
-  const isBalanceEnough = walletBalance >= totalContractMoney;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-lg w-96">
-        <div className="bg-green-500 text-white text-center py-2 text-lg font-semibold">
-          Number 1 Selected
-        </div>
-        <div className="p-4">
-          <p className="font-medium mb-2">Contract Money</p>
-          <div className="flex gap-4 mb-4">
-            {[10, 100, 1000, 10000].map((amount) => (
-              <button
-                key={amount}
-                className={`px-4 py-2 rounded ${selectedAmount === amount ? "bg-green-500 text-white" : "bg-gray-200"}`}
-                onClick={() => setSelectedAmount(amount)}
-              >
-                {amount}
-              </button>
-            ))}
+    <div>
+      <button onClick={togglePopup} style={{ padding: "10px 20px", backgroundColor: "purple", color: "white", border: "none", borderRadius: "5px" }}>
+        Join Violet
+      </button>
+
+      {isOpen && (
+        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0, 0, 0, 0.5)", display: "flex", justifyContent: "center", alignItems: "center" }}>
+          <div style={{ width: "500px", backgroundColor: "white", borderRadius: "10px", overflow: "hidden" }}>
+            <div style={{ backgroundColor: "purple", color: "white", padding: "15px", textAlign: "center", fontSize: "18px" }}>
+              Join Violet
+            </div>
+            <div style={{ padding: "20px" }}>
+              <div style={{ marginBottom: "15px" }}>
+                <div style={{ marginBottom: "10px", fontWeight: "bold" }}>Contract Money</div>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  {[10, 100, 1000, 10000].map((amount) => (
+                    <button
+                      key={amount}
+                      onClick={() => handleAmountClick(amount)}
+                      style={{
+                        padding: "10px 20px",
+                        border: "none",
+                        borderRadius: "5px",
+                        backgroundColor: selectedAmount === amount ? "green" : "#f0f0f0",
+                        color: selectedAmount === amount ? "white" : "black",
+                      }}
+                    >
+                      {amount}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ marginBottom: "15px" }}>
+                <div style={{ marginBottom: "10px", fontWeight: "bold" }}>Number</div>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <button
+                    onClick={() => handleQuantityChange("decrement")}
+                    style={{ padding: "5px 10px", border: "1px solid #ccc", borderRadius: "5px" }}
+                  >
+                    -
+                  </button>
+                  <span>{quantity}</span>
+                  <button
+                    onClick={() => handleQuantityChange("increment")}
+                    style={{ padding: "5px 10px", border: "1px solid #ccc", borderRadius: "5px" }}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              <div style={{ marginBottom: "15px", color: totalContractMoney > balance ? "red" : "black" }}>
+                {totalContractMoney > balance ? "Balance is not enough." : ""}
+                <div>Total contract money is {totalContractMoney}</div>
+              </div>
+
+              <div style={{ marginBottom: "15px" }}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={handleCheckboxChange}
+                    style={{ marginRight: "10px" }}
+                  />
+                  I agree <span style={{ color: "red" }}>PRESALE RULE</span>
+                </label>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <button
+                  onClick={togglePopup}
+                  style={{ padding: "10px 20px", border: "none", backgroundColor: "#f0f0f0", borderRadius: "5px" }}
+                >
+                  CANCEL
+                </button>
+                <button
+                  disabled={!isChecked || totalContractMoney > balance}
+                  style={{
+                    padding: "10px 20px",
+                    border: "none",
+                    backgroundColor: !isChecked || totalContractMoney > balance ? "#ccc" : "green",
+                    color: "white",
+                    borderRadius: "5px",
+                  }}
+                >
+                  CONFIRM
+                </button>
+              </div>
+            </div>
           </div>
-
-          <p className="font-medium mb-2">Number</p>
-          <div className="flex items-center gap-2 mb-4">
-            <button
-              className="px-3 py-1 border rounded bg-gray-200"
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-            >
-              -
-            </button>
-            <span>{quantity}</span>
-            <button
-              className="px-3 py-1 border rounded bg-gray-200"
-              onClick={() => setQuantity(quantity + 1)}
-            >
-              +
-            </button>
-          </div>
-
-          <p className="text-sm">
-            Total contract money is <span className="text-green-500">{totalContractMoney}</span>
-          </p>
-          {!isBalanceEnough && (
-            <p className="text-red-500 text-sm">Balance is not enough</p>
-          )}
-
-          <div className="flex items-center mt-4">
-            <input
-              type="checkbox"
-              checked={isAgreed}
-              onChange={() => setIsAgreed(!isAgreed)}
-              className="mr-2"
-            />
-            <span>
-              I agree <span className="text-red-500">PRESALE RULE</span>
-            </span>
-          </div>
         </div>
-
-        <div className="flex border-t">
-          <button
-            className="w-1/2 py-2 text-center border-r hover:bg-gray-200"
-            onClick={onClose}
-          >
-            CANCEL
-          </button>
-          <button
-            className={`w-1/2 py-2 text-center ${isBalanceEnough && isAgreed ? "text-green-500" : "text-gray-400 cursor-not-allowed"}`}
-            disabled={!isBalanceEnough || !isAgreed}
-            onClick={() => isBalanceEnough && isAgreed && onConfirm(totalContractMoney)}
-          >
-            CONFIRM
-          </button>
-        </div>
-      </div>
+      )}
     </div>
   );
 };
 
-export default ColorGamePopup;
+export default PopupComponent;
