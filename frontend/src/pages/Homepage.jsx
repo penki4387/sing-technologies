@@ -7,6 +7,7 @@ import KYCManager from "../components/User/KYCManager";
 import GamesComponent from "../components/User/GamesComponent";
 import "../components/User/UserDashboard.css";
 import ColorGamesComponent from "../components/User/ColorGamesComponent";
+import HIstoryComponent from "../components/User/UserHistory"
 
 const Homepage = () => {
   const [activeComponent, setActiveComponent] = useState("dashboard");
@@ -29,6 +30,8 @@ const Homepage = () => {
             return <ColorGamesComponent/>;
           case "gameTypeB":
             return <GamesComponent />;
+            case "history":
+              return <HIstoryComponent />;
           default:
             return <div>Select a game to view details.</div>;
         }
@@ -130,6 +133,17 @@ const Homepage = () => {
                       className="block w-full text-left py-2 px-4 rounded hover:bg-green-600"
                     >
                       Normal Games
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => {
+                        setSelectedGame("history");
+                        setActiveComponent("games");
+                      }}
+                      className="block w-full text-left py-2 px-4 rounded hover:bg-green-600"
+                    >
+                     History
                     </button>
                   </li>
                 </ul>

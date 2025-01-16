@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import PopupComponent from "./PopUpComponent"; // Import the popup
-
+import GamePopup from "./PopUpComponent"; // Import the popup
+import { Button } from "reactstrap";
+import axios from "axios"; // Import axios
+import { PREDICT_COLOR } from "../../constants/apiEndpoints"; // Assuming this is defined
 const ColorGamesComponent = () => {
   const [timeLeft, setTimeLeft] = useState({
     "1min": 60,
@@ -21,6 +23,14 @@ const ColorGamesComponent = () => {
     "5min": "202501088596", // initial period for 5min table
     "10min": "202501088597", // initial period for 10min table
   });
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedTitle, setSelectedTitle] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedNumber, setSelectedNumber] = useState(null);
+  const [popupType, setPopupType] = useState(""); // Store the popup type (e.g., "Violet")
+  const [selectedType, setSelectedType] = useState("");
+  const [isPopupOpen, setIsPopupOpen] = useState(false); // Popup state
+  const [selectedButton, setSelectedButton] = useState(null); // Track which button was clicked
   const [activeTable, setActiveTable] = useState("1min");
   const [currentPage, setCurrentPage] = useState(1); // Current page for pagination
   const [period, setPeriod] = useState("202501088594"); // Set an initial period
@@ -56,6 +66,14 @@ const ColorGamesComponent = () => {
   const recordsPerPage = 10;
   const totalPages = Math.ceil(tableData[activeTable].length / recordsPerPage);
 
+  const openPopup = (title, color) => {
+    setSelectedTitle(title);
+    setSelectedColor(color);
+    setModalOpen(true);
+  };
+ const toggleModal = () => {
+    setModalOpen(false);
+  };
   const handlePageChange = (pageNumber) => {
     if (pageNumber >= 1 && pageNumber <= totalPages) {
       setCurrentPage(pageNumber);
@@ -202,102 +220,7 @@ useEffect(() => {
   return () => clearInterval(interval);
 }, []);
 
-  // //1min table
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setTimeLeft((prevTimeLeft) => {
-  //       const newTimeLeft = { ...prevTimeLeft };
-  
-  //       if (newTimeLeft["1min"] === 0) {
-  //         newTimeLeft["1min"] = 60;
-  //       } else {
-  //         newTimeLeft["1min"] -= 1;
-  //       }
-  
-  //       return newTimeLeft;
-  //     });
-  //   }, 1000);
-  
-  //   return () => clearInterval(interval);
-  // }, []);
-  
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setTimeLeft((prevTimeLeft) => {
-  //       const newTimeLeft = { ...prevTimeLeft };
-
-  //       if (newTimeLeft["3min"] === 0) {
-  //         // Reset to 180 seconds when time reaches 0
-  //         newTimeLeft["3min"] = 180;
-  //       } else {
-  //         newTimeLeft["3min"] -= 1;
-  //       }
-
-  //       return newTimeLeft;
-  //     });
-  //   }, 1000);
-
-  //   return () => clearInterval(interval); // Cleanup on unmount
-  // }, []); // Only run on mount
-
-  // // Timer logic for 5min table
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setTimeLeft((prevTimeLeft) => {
-  //       const newTimeLeft = { ...prevTimeLeft };
-
-  //       if (newTimeLeft["5min"] === 0) {
-  //         // Reset to 300 seconds when time reaches 0
-  //         newTimeLeft["5min"] = 300;
-  //       } else {
-  //         newTimeLeft["5min"] -= 1;
-  //       }
-
-  //       return newTimeLeft;
-  //     });
-  //   }, 1000);
-
-  //   return () => clearInterval(interval); // Cleanup on unmount
-  // }, []); // Only run on mount
-
-  // // Timer logic for 10min table
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setTimeLeft((prevTimeLeft) => {
-  //       const newTimeLeft = { ...prevTimeLeft };
-
-  //       if (newTimeLeft["10min"] === 0) {
-  //         // Reset to 600 seconds when time reaches 0
-  //         newTimeLeft["10min"] = 600;
-  //       } else {
-  //         newTimeLeft["10min"] -= 1;
-  //       }
-
-  //       return newTimeLeft;
-  //     });
-  //   }, 1000);
-
-  //   return () => clearInterval(interval); // Cleanup on unmount
-  // }, []); // Only run on mount
-
-
-  
-  // Synchronized Period and Button State Update
-  // useEffect(() => {
-  //   if (timeLeft[activeTable] === 0) {
-  //     const currentDate = new Date();
-  //     const year = currentDate.getFullYear();
-  //     const month = (currentDate.getMonth() + 1).toString().padStart(2, "0"); // Month is 0-indexed
-  //     const day = currentDate.getDate().toString().padStart(2, "0");
-  //     const randomLast4 = Math.floor(Math.random() * 10000); // Random last 4 digits
-  //     setPeriod(`${year}${month}${day}${randomLast4}`); // Format: YYYYMMDD + last 4 random digits
-  //     setIsDisabled(true); 
-  //   }
-
-  //   if (timeLeft[activeTable] === 60) {
-  //     setIsDisabled(false); // Re-enable buttons after the full cycle
-  //   }
-  // }, [timeLeft, activeTable]);
+ 
 
   // Decrease saturation after 10 seconds
   useEffect(() => {
@@ -357,6 +280,7 @@ useEffect(() => {
             background: isDisabled[activeTable] ? "rgb(169, 169, 169)" : "#10B981",
           }}
           disabled={isDisabled[activeTable]}
+          onClick={() => openPopup("Join Green", "#10B981")}
         >
           Join Green
         </button>
@@ -366,6 +290,7 @@ useEffect(() => {
             background: isDisabled[activeTable] ? "rgb(169, 169, 169)" : "#8b5cf6",
           }}
           disabled={isDisabled[activeTable]}
+          onClick={() => openPopup("Join Violet", "#8B1DBD")}
         >
           Join Violet
         </button>
@@ -375,6 +300,7 @@ useEffect(() => {
             background: isDisabled[activeTable] ? "rgb(169, 169, 169)" : "#EF4444",
           }}
           disabled={isDisabled[activeTable]}
+          onClick={() => openPopup("Join Red", "#EF4444")}
         >
           Join Red
         </button>
@@ -382,13 +308,15 @@ useEffect(() => {
   
       {/* Number Buttons */}
       <div className="grid grid-cols-5 sm:grid-cols-5 gap-2 w-full max-w-5xl mb-6">
-        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((num, index) => {
-          let backgroundColor = "rgb(169, 169, 169)"; // Default to gray if disabled
+        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => {
+          let backgroundColor = "rgb(169, 169, 169)"; // Default gray if disabled
+          let buttonTitle = `Number ${num} Selected`;
+
           if (!isDisabled[activeTable]) {
-            if (index === 0) {
-              backgroundColor = "linear-gradient(135deg, #ef4444 50%, #8b5cf6 50%)";
-            } else if (index === 5) {
-              backgroundColor = "linear-gradient(135deg, #10B981 50%, #8b5cf6 50%)";
+            if (num === 0) {
+              backgroundColor = "linear-gradient(135deg, #ef4444 50%, #8b5cf6 50%)"; // Red & Violet
+            } else if (num === 5) {
+              backgroundColor = "linear-gradient(135deg, #10B981 50%, #8b5cf6 50%)"; // Green & Violet
             } else if (num % 2 === 0) {
               backgroundColor = "#10B981"; // Green for even numbers
             } else {
@@ -398,10 +326,11 @@ useEffect(() => {
   
           return (
             <button
-              key={index}
+              key={num}
               className="px-2 py-1 rounded text-white w-full"
               style={{ background: backgroundColor }}
               disabled={isDisabled[activeTable]}
+              onClick={() => openPopup(buttonTitle, backgroundColor)}
             >
               {num}
             </button>
@@ -417,6 +346,7 @@ useEffect(() => {
               background: isDisabled[activeTable] ? "rgb(169, 169, 169)" : "#EF4444",
             }}
             disabled={isDisabled[activeTable]}
+            onClick={() => openPopup("Big Selected", "#EF4444")}
           >
             Big
           </button>
@@ -428,6 +358,7 @@ useEffect(() => {
               background: isDisabled[activeTable] ? "rgb(169, 169, 169)" : "#10B981",
             }}
             disabled={isDisabled[activeTable]}
+            onClick={() => openPopup("Small Selected", "#10B981")}
           >
             Small
           </button>
@@ -564,6 +495,10 @@ useEffect(() => {
           </button>
         </div>
       </div>
+     {/* Game Popup Component */}
+     {modalOpen && (
+        <GamePopup modalOpen={modalOpen} toggleModal={toggleModal} title={selectedTitle} color={selectedColor} />
+      )}
     </div>
   );
   

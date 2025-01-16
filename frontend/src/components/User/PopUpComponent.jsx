@@ -1,130 +1,120 @@
 import React, { useState } from "react";
+import { Modal, ModalHeader, ModalBody, ModalFooter, Button, FormGroup, Label, Input } from "reactstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
+import PresaleRuleContent from './PreSaleRuleContent';  // Import the presale rule content
+import axios from "axios"; // Import axios
+import { PREDICT_COLOR } from "../../constants/apiEndpoints"; // Assuming this is defined
 
-const PopupComponent = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedAmount, setSelectedAmount] = useState(10);
-  const [quantity, setQuantity] = useState(1);
-  const [balance, setBalance] = useState(50); // Example balance
-  const [isChecked, setIsChecked] = useState(false);
+const GamePopup = ({ modalOpen, toggleModal, title, color }) => {
+  const [amount, setAmount] = useState(50);
+  const [balance, setBalance] = useState(50);
+  const [isAgreed, setIsAgreed] = useState(false);
+  const [error, setError] = useState("");
+  const [isSecondModalOpen, setIsSecondModalOpen] = useState(false); // New state for second modal
 
-  const togglePopup = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const handleAmountClick = (amount) => {
-    setSelectedAmount(amount);
-  };
-
-  const handleQuantityChange = (type) => {
-    if (type === "increment") {
-      setQuantity(quantity + 1);
-    } else if (type === "decrement" && quantity > 1) {
-      setQuantity(quantity - 1);
+  // Handle amount input change
+  const handleAmountChange = (e) => {
+    const value = e.target.value;
+    setAmount(value);
+    if (value < 10) {
+      setError("Minimum amount should be 10 rupees.");
+    } else {
+      setError("");
     }
   };
 
-  const handleCheckboxChange = () => {
-    setIsChecked(!isChecked);
+  // Handle Confirm button click
+  const handleConfirm = () => {
+    if (amount < 10) {
+      setError("Minimum amount should be 10 rupees.");
+      return;
+    }
+    if (balance < amount) {
+      setError("Balance is not enough.");
+      return;
+    }
+    if (!isAgreed) {
+      setError("You must agree to the presale rule.");
+      return;
+    }
+
+    setBalance(balance - amount);
+    alert(`Transaction successful! Amount: ₹${amount} for ${title}`);
+    toggleModal(); // Close modal after transaction
   };
 
-  const totalContractMoney = selectedAmount * quantity;
+  // Open second modal when PRESALE RULE is clicked
+  const handlePresaleRuleClick = () => {
+    setIsSecondModalOpen(true); // Open second modal when PRESALE RULE is clicked
+  };
+
+  // Second modal (Presale Rule Info)
+  const toggleSecondModal = () => {
+    setIsSecondModalOpen(!isSecondModalOpen);
+  };
 
   return (
-    <div>
-      <button onClick={togglePopup} style={{ padding: "10px 20px", backgroundColor: "purple", color: "white", border: "none", borderRadius: "5px" }}>
-        Join Violet
-      </button>
+    <>
+      <Modal isOpen={modalOpen} toggle={toggleModal} centered>
+        <ModalHeader toggle={toggleModal} style={{ background: color, color: "white" }}>
+          {title}
+        </ModalHeader>
+        <ModalBody>
+          <FormGroup>
+            <Label for="amount">Enter Contract Money</Label>
+            <Input
+              type="number"
+              id="amount"
+              value={amount}
+              onChange={handleAmountChange}
+              min="10"
+              placeholder="Enter amount (min 10)"
+            />
+          </FormGroup>
+          {error && <p style={{ color: "red" }}>{error}</p>}
+          <p style={{ color: "green" }}>Total contract money is {amount || 0}</p>
+          <FormGroup check>
+            <Label check>
+              <Input
+                type="checkbox"
+                checked={isAgreed}
+                onChange={() => setIsAgreed(!isAgreed)}
+              />
+              I agree
+              <span 
+                style={{ color: "red", cursor: "pointer" }} 
+                onClick={handlePresaleRuleClick} // <-- Highlighted change
+              >
+                {" "}PRESALE RULE
+              </span>
+            </Label>
+          </FormGroup>
+        </ModalBody>
+        <ModalFooter>
+          <Button color="secondary" onClick={toggleModal}>CANCEL</Button>
+          <Button color="success" onClick={handleConfirm}>CONFIRM</Button>
+        </ModalFooter>
+      </Modal>
 
-      {isOpen && (
-        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0, 0, 0, 0.5)", display: "flex", justifyContent: "center", alignItems: "center" }}>
-          <div style={{ width: "500px", backgroundColor: "white", borderRadius: "10px", overflow: "hidden" }}>
-            <div style={{ backgroundColor: "purple", color: "white", padding: "15px", textAlign: "center", fontSize: "18px" }}>
-              Join Violet
-            </div>
-            <div style={{ padding: "20px" }}>
-              <div style={{ marginBottom: "15px" }}>
-                <div style={{ marginBottom: "10px", fontWeight: "bold" }}>Contract Money</div>
-                <div style={{ display: "flex", gap: "10px" }}>
-                  {[10, 100, 1000, 10000].map((amount) => (
-                    <button
-                      key={amount}
-                      onClick={() => handleAmountClick(amount)}
-                      style={{
-                        padding: "10px 20px",
-                        border: "none",
-                        borderRadius: "5px",
-                        backgroundColor: selectedAmount === amount ? "green" : "#f0f0f0",
-                        color: selectedAmount === amount ? "white" : "black",
-                      }}
-                    >
-                      {amount}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div style={{ marginBottom: "15px" }}>
-                <div style={{ marginBottom: "10px", fontWeight: "bold" }}>Number</div>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <button
-                    onClick={() => handleQuantityChange("decrement")}
-                    style={{ padding: "5px 10px", border: "1px solid #ccc", borderRadius: "5px" }}
-                  >
-                    -
-                  </button>
-                  <span>{quantity}</span>
-                  <button
-                    onClick={() => handleQuantityChange("increment")}
-                    style={{ padding: "5px 10px", border: "1px solid #ccc", borderRadius: "5px" }}
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-
-              <div style={{ marginBottom: "15px", color: totalContractMoney > balance ? "red" : "black" }}>
-                {totalContractMoney > balance ? "Balance is not enough." : ""}
-                <div>Total contract money is {totalContractMoney}</div>
-              </div>
-
-              <div style={{ marginBottom: "15px" }}>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={isChecked}
-                    onChange={handleCheckboxChange}
-                    style={{ marginRight: "10px" }}
-                  />
-                  I agree <span style={{ color: "red" }}>PRESALE RULE</span>
-                </label>
-              </div>
-
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <button
-                  onClick={togglePopup}
-                  style={{ padding: "10px 20px", border: "none", backgroundColor: "#f0f0f0", borderRadius: "5px" }}
-                >
-                  CANCEL
-                </button>
-                <button
-                  disabled={!isChecked || totalContractMoney > balance}
-                  style={{
-                    padding: "10px 20px",
-                    border: "none",
-                    backgroundColor: !isChecked || totalContractMoney > balance ? "#ccc" : "green",
-                    color: "white",
-                    borderRadius: "5px",
-                  }}
-                >
-                  CONFIRM
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+      {/* Second Modal for Presale Rule (Make it larger) */}
+      <Modal 
+        isOpen={isSecondModalOpen} 
+        toggle={toggleSecondModal} 
+        centered 
+        size="lg"  // <-- Highlighted change: size="lg" to make the modal large
+      >
+        <ModalHeader toggle={toggleSecondModal} style={{ background: color, color: "white" }}>
+          PRESALE RULE
+        </ModalHeader>
+        <ModalBody>
+          <PresaleRuleContent /> {/* Use the imported content */}
+        </ModalBody>
+        <ModalFooter>
+          <Button color="secondary" onClick={toggleSecondModal}>CLOSE</Button>
+        </ModalFooter>
+      </Modal>
+    </>
   );
 };
 
-export default PopupComponent;
+export default GamePopup;

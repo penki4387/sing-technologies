@@ -46,3 +46,7 @@ export const UPDATE_BANK_ACCOUNT = (id) => `${BASE_URL}/api/bankaccount/update/$
 export const GET_BANK_ACCOUNTS_BY_USER_ID = (id) => `${BASE_URL}/api/bankaccount/getone/user/${id}`;
 export const ADD_BANK_ACCOUNT = `${BASE_URL}/api/bankaccount/addnew`;
 export const DELETE_BANK_ACCOUNT = (id) => `${BASE_URL}/api/bankaccount/delete/${id}`;
+
+// color prediction
+ export const PREDICT_COLOR = `${BASE_URL}/api/color/prediction`;
+ export const USER_HISTORY = (id) => `${BASE_URL}/api/color/prediction/${id}`;

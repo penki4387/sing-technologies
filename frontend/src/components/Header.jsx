@@ -27,7 +27,7 @@ const Header = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/user/wallet/${userId}`);
+        const response = await axios.get(`http://localhost:3000/api/user/wallet/${userId}`);
         setWallet(response.data);
       } catch (error) {
         console.error("Error fetching wallet data:", error);
