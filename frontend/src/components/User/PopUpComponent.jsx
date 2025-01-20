@@ -2,10 +2,8 @@ import React, { useState } from "react";
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button, FormGroup, Label, Input } from "reactstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import PresaleRuleContent from './PreSaleRuleContent';  // Import the presale rule content
-import axios from "axios"; // Import axios
-import { PREDICT_COLOR } from "../../constants/apiEndpoints"; // Assuming this is defined
 
-const GamePopup = ({ modalOpen, toggleModal, title, color }) => {
+const GamePopup = ({ modalOpen, toggleModal, title, color ,sendData}) => {
   const [amount, setAmount] = useState(50);
   const [balance, setBalance] = useState(50);
   const [isAgreed, setIsAgreed] = useState(false);
@@ -37,9 +35,9 @@ const GamePopup = ({ modalOpen, toggleModal, title, color }) => {
       setError("You must agree to the presale rule.");
       return;
     }
-
+  sendData(amount)
     setBalance(balance - amount);
-    alert(`Transaction successful! Amount: ₹${amount} for ${title}`);
+    // alert(`Transaction successful! Amount: ₹${amount} for ${title}`);
     toggleModal(); // Close modal after transaction
   };
 

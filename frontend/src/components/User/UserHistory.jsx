@@ -21,8 +21,22 @@ const HIstoryComponent = () => {
   const fetchUserHistory = async (id) => {
     try {
       const response = await axios.get(USER_HISTORY(id));
-      console.log(response.data, "=================");
-      setTableData(response.data);
+      const updatedData = response.data.map((row) => {
+        // Determine color based on gradient or number
+        if (
+          row.color === "linear-gradient(135deg, #ef4444 50%, #8b5cf6 50%)" ||
+          row.number === 0
+        ) {
+          return { ...row, color: "#8B5CF6 + #EF4444" };
+        } else if (
+          row.color === "linear-gradient(135deg, #10B981 50%, #8b5cf6 50%)" ||
+          row.number === 5
+        ) {
+          return { ...row, color: "#8B5CF6 + #10B981" };
+        }
+        return row;
+      });
+      setTableData(updatedData);
     } catch (error) {
       console.error("Error fetching user history:", error);
     }
@@ -65,10 +79,11 @@ const HIstoryComponent = () => {
           <thead>
             <tr className="bg-gray-700">
               <th className="px-4 py-2">Period</th>
-              <th className="px-4 py-2">Price</th>
+              <th className="px-4 py-2">Amount</th>
               <th className="px-4 py-2">Number</th>
-              <th className="px-4 py-2">Result</th>
+              <th className="px-4 py-2">Color</th>
               <th className="px-4 py-2">mins</th>
+              <th className="px-4 py-2">Small&Big</th>
             </tr>
           </thead>
           <tbody>
@@ -88,12 +103,7 @@ const HIstoryComponent = () => {
                             width: "20px",
                             height: "20px",
                             borderRadius: "50%",
-                            backgroundColor:
-                              color === "green"
-                                ? "#10B981"
-                                : color === "violet"
-                                ? "#8b5cf6"
-                                : "#EF4444",
+                            backgroundColor: color,
                           }}
                         ></span>
                       </React.Fragment>
@@ -105,17 +115,13 @@ const HIstoryComponent = () => {
                         width: "20px",
                         height: "20px",
                         borderRadius: "50%",
-                        backgroundColor:
-                          row.color === "green"
-                            ? "#10B981"
-                            : row.color === "violet"
-                            ? "#8b5cf6"
-                            : "#EF4444",
+                        backgroundColor: row.color,
                       }}
                     ></span>
                   )}
                 </td>
                 <td className="px-4 py-2">{row.mins}</td>
+                <td className="px-4 py-2">{row.small_big}</td>
               </tr>
             ))}
           </tbody>

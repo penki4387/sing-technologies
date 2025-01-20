@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import GamePopup from "./PopUpComponent"; // Import the popup
-import { Button } from "reactstrap";
-import axios from "axios"; // Import axios
 import { PREDICT_COLOR } from "../../constants/apiEndpoints"; // Assuming this is defined
+import axios from 'axios'; 
+
+
 const ColorGamesComponent = () => {
   const [timeLeft, setTimeLeft] = useState({
     "1min": 60,
@@ -17,23 +18,13 @@ const ColorGamesComponent = () => {
     "5min": false,
     "10min": false,
   });
-   const [periods, setPeriods] = useState({
-    "1min": "202501088594", // initial period for 1min table
-    "3min": "202501088595", // initial period for 3min table
-    "5min": "202501088596", // initial period for 5min table
-    "10min": "202501088597", // initial period for 10min table
-  });
+  
+  const [smallBig, setSmallBig] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedTitle, setSelectedTitle] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
-  const [selectedNumber, setSelectedNumber] = useState(null);
-  const [popupType, setPopupType] = useState(""); // Store the popup type (e.g., "Violet")
-  const [selectedType, setSelectedType] = useState("");
-  const [isPopupOpen, setIsPopupOpen] = useState(false); // Popup state
-  const [selectedButton, setSelectedButton] = useState(null); // Track which button was clicked
   const [activeTable, setActiveTable] = useState("1min");
   const [currentPage, setCurrentPage] = useState(1); // Current page for pagination
-  const [period, setPeriod] = useState("202501088594"); // Set an initial period
   const [saturation, setSaturation] = useState(1); // Variable for table saturation effect
 
   const tableData = {
@@ -65,7 +56,21 @@ const ColorGamesComponent = () => {
 
   const recordsPerPage = 10;
   const totalPages = Math.ceil(tableData[activeTable].length / recordsPerPage);
-
+// Function to generate a new period with random last 4 digits
+const generateNewPeriod = (tableName) => {
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = (currentDate.getMonth() + 1).toString().padStart(2, "0");
+  const day = currentDate.getDate().toString().padStart(2, "0");
+  const randomLast4 = Math.floor(1000 + Math.random() * 9000); // Ensure 4-digit random number
+  return `${year}${month}${day}${randomLast4}`;
+};
+const [periods, setPeriods] = useState({
+  "1min": generateNewPeriod(), // initial period for 1min table
+  "3min": generateNewPeriod(), // initial period for 3min table
+  "5min": generateNewPeriod(), // initial period for 5min table
+  "10min": generateNewPeriod(), // initial period for 10min table
+});
   const openPopup = (title, color) => {
     setSelectedTitle(title);
     setSelectedColor(color);
@@ -97,6 +102,59 @@ const ColorGamesComponent = () => {
     currentPage * recordsPerPage
   );
 
+  const handleGamePopUp = (data) => {
+    const userid = sessionStorage.getItem("userId") || null;
+    const amount = data;
+    const color = selectedColor; // Ensure this variable is defined and has a value
+    let number = [];
+    let smallBigValue = "";
+  
+    if (selectedTitle === "Join Green") {
+      number = [2, 4, 5, 6, 8];
+    } else if (selectedTitle === "Join Red") {
+      number = [0, 1, 3, 7, 9];
+    } else if (selectedTitle === "Join Violet") {
+      number = [0, 5];
+    } else if (smallBig === "small") {
+      number = [0, 1, 2, 3, 4]; // Small numbers
+      smallBigValue = "small";
+    } else if (smallBig === "big") {
+      number = [5, 6, 7, 8, 9]; // Big numbers
+      smallBigValue = "big";
+    } else {
+      number = [parseInt(selectedTitle.split(" ")[1])];
+    }
+  
+    const period = periods[activeTable]; // Ensure periods is defined
+    const mins = activeTable; // Ensure activeTable is correctly defined
+  
+    const payload = {
+      userid,
+      amount,
+      color,
+      number,
+      period,
+      mins,
+      small_big: smallBigValue,
+    };
+  
+    console.log("Payload:====================", payload);
+  
+    axios
+      .post(PREDICT_COLOR, payload, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("API response:", response.data);
+      })
+      .catch((error) => {
+        console.error("Error calling PREDICT_COLOR API:", error);
+      });
+  };
+  
+  
   // Disable buttons and change color for the 1min table only after 30 seconds
   useEffect(() => {
     if (timeLeft["1min"] === 10) {
@@ -130,15 +188,7 @@ const ColorGamesComponent = () => {
     }
   }, [timeLeft["10min"]]);
 
-// Function to generate a new period with random last 4 digits
-const generateNewPeriod = (tableName) => {
-  const currentDate = new Date();
-  const year = currentDate.getFullYear();
-  const month = (currentDate.getMonth() + 1).toString().padStart(2, "0");
-  const day = currentDate.getDate().toString().padStart(2, "0");
-  const randomLast4 = Math.floor(1000 + Math.random() * 9000); // Ensure 4-digit random number
-  return `${year}${month}${day}${randomLast4}`;
-};
+
 
 // Timer for 1min table
 useEffect(() => {
@@ -261,16 +311,24 @@ useEffect(() => {
       </div>
   
       {/* Timer & Period */}
-      <div className="flex flex-col sm:flex-row justify-between items-center w-full max-w-5xl mb-6">
-        <div className="flex items-center mb-2 sm:mb-0">
-          <span className="text-green-500 font-bold text-xl">🏆</span>
-          <span className="text-lg font-bold mx-2">Period</span>
-          <span className="text-lg font-bold">{periods[activeTable]}</span>
-        </div>
-        <span className="bg-gray-700 px-4 py-2 rounded">
-          Time Left: {formatTime(timeLeft[activeTable])}
-        </span>
-      </div>
+ {/* Timer & Period */}
+<div className="flex flex-col sm:flex-row justify-between items-center w-full max-w-5xl mb-6">
+  <div className="flex items-center mb-2 sm:mb-0">
+    <span className="text-green-500 font-bold text-xl">🏆</span>
+    <span className="text-lg font-bold mx-2">Period</span>
+    <span
+      className="text-white font-bold px-4 py-2 rounded"
+      style={{ backgroundColor: "rgb(26, 61, 40)" }} // Desired color
+    >
+      {periods[activeTable]}
+    </span>
+  </div>
+  <span className="bg-gray-700 px-4 py-2 rounded">
+    Time Left: {formatTime(timeLeft[activeTable])}
+  </span>
+</div>
+
+
   
       {/* Join Buttons */}
       <div className="grid grid-cols-3 sm:grid-cols-3 gap-4 w-full max-w-5xl mb-6">
@@ -346,7 +404,11 @@ useEffect(() => {
               background: isDisabled[activeTable] ? "rgb(169, 169, 169)" : "#EF4444",
             }}
             disabled={isDisabled[activeTable]}
-            onClick={() => openPopup("Big Selected", "#EF4444")}
+            onClick={() => {
+              setSmallBig("big"); // Set smallBig to 'big'
+              openPopup("Big Selected", "#EF4444");
+             
+            }}
           >
             Big
           </button>
@@ -358,7 +420,11 @@ useEffect(() => {
               background: isDisabled[activeTable] ? "rgb(169, 169, 169)" : "#10B981",
             }}
             disabled={isDisabled[activeTable]}
-            onClick={() => openPopup("Small Selected", "#10B981")}
+            onClick={() => {
+              setSmallBig("small"); // Set smallBig to 'small'
+              openPopup("Small Selected", "#10B981");
+            
+            }}
           >
             Small
           </button>
@@ -418,7 +484,7 @@ useEffect(() => {
                           width: "20px",
                           height: "20px",
                           borderRadius: "50%",
-                          backgroundColor: "#10B981",
+                          backgroundColor: "#8b5cf6",
                         }}
                       ></span>
                       <span> + </span>
@@ -428,7 +494,7 @@ useEffect(() => {
                           width: "20px",
                           height: "20px",
                           borderRadius: "50%",
-                          backgroundColor: "#8b5cf6",
+                          backgroundColor: "#10B981",
                         }}
                       ></span>
                     </>
@@ -497,7 +563,7 @@ useEffect(() => {
       </div>
      {/* Game Popup Component */}
      {modalOpen && (
-        <GamePopup modalOpen={modalOpen} toggleModal={toggleModal} title={selectedTitle} color={selectedColor} />
+        <GamePopup modalOpen={modalOpen} toggleModal={toggleModal} title={selectedTitle} color={selectedColor} sendData={handleGamePopUp} />
       )}
     </div>
   );
