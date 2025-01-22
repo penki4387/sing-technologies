@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button, FormGroup, Label, Input } from "reactstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
+import axios from "axios";
 import PresaleRuleContent from './PreSaleRuleContent';  // Import the presale rule content
+import { USER_WALLET_DETAILS } from "../../constants/apiEndpoints"; 
 
-const GamePopup = ({ modalOpen, toggleModal, title, color ,sendData}) => {
-  const [amount, setAmount] = useState(50);
-  const [balance, setBalance] = useState(50);
+const GamePopup = ({ modalOpen, toggleModal, title, color, sendData,balance,setBalance }) => {
+  const [amount, setAmount] = useState(10);
+  // const [balance, setBalance] = useState(0);
   const [isAgreed, setIsAgreed] = useState(false);
   const [error, setError] = useState("");
   const [isSecondModalOpen, setIsSecondModalOpen] = useState(false); // New state for second modal
+
 
   // Handle amount input change
   const handleAmountChange = (e) => {
@@ -35,9 +38,9 @@ const GamePopup = ({ modalOpen, toggleModal, title, color ,sendData}) => {
       setError("You must agree to the presale rule.");
       return;
     }
-  sendData(amount)
-    setBalance(balance - amount);
-    // alert(`Transaction successful! Amount: ₹${amount} for ${title}`);
+    sendData(amount);
+    // setBalance(balance - amount);
+    alert(`Transaction successful! Amount: ₹${amount} for ${title}`);
     toggleModal(); // Close modal after transaction
   };
 
@@ -70,7 +73,7 @@ const GamePopup = ({ modalOpen, toggleModal, title, color ,sendData}) => {
             />
           </FormGroup>
           {error && <p style={{ color: "red" }}>{error}</p>}
-          <p style={{ color: "green" }}>Total contract money is {amount || 0}</p>
+          <p style={{ color: "green" }}>Total contract money is ₹{amount || 0}</p>
           <FormGroup check>
             <Label check>
               <Input
@@ -79,8 +82,8 @@ const GamePopup = ({ modalOpen, toggleModal, title, color ,sendData}) => {
                 onChange={() => setIsAgreed(!isAgreed)}
               />
               I agree
-              <span 
-                style={{ color: "red", cursor: "pointer" }} 
+              <span
+                style={{ color: "red", cursor: "pointer" }}
                 onClick={handlePresaleRuleClick} // <-- Highlighted change
               >
                 {" "}PRESALE RULE

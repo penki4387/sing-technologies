@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import GamePopup from "./PopUpComponent"; // Import the popup
-import { PREDICT_COLOR } from "../../constants/apiEndpoints"; // Assuming this is defined
+import Header from "../Header"
+import { PREDICT_COLOR,SET_WALLET_DETAILS,USER_WALLET_DETAILS } from "../../constants/apiEndpoints"; // Assuming this is defined
 import axios from 'axios'; 
-
+import { useNavigate } from "react-router-dom";
 
 const ColorGamesComponent = () => {
+  const userid = sessionStorage.getItem("userId");
   const [timeLeft, setTimeLeft] = useState({
     "1min": 60,
-    "3min": 180,
+    "3min": 180, 
     "5min": 300,
     "10min": 600,
   }); // Timer for each table
@@ -18,7 +20,8 @@ const ColorGamesComponent = () => {
     "5min": false,
     "10min": false,
   });
-  
+  const [update,setUpdate] = useState(false)
+  const [balance, setBalance] = useState(false);
   const [smallBig, setSmallBig] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedTitle, setSelectedTitle] = useState("");
@@ -101,9 +104,45 @@ const [periods, setPeriods] = useState({
     (currentPage - 1) * recordsPerPage,
     currentPage * recordsPerPage
   );
+// Fetch wallet details from API
+const fetchWalletDetails = async () => {
+  const userId = sessionStorage.getItem("userId"); // Get user ID from session storage
+    try {
+      const response = await axios.get(USER_WALLET_DETAILS(userId), {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      // Find the CP balance in the response
+      const cpBalance = response.data.find(item => item.cryptoname === "CP");
+      console.log(cpBalance,);
+      
+      if (cpBalance) {
+        setBalance(parseInt(cpBalance.balance, 10)); // Set the CP balance
+      }
+    } catch (error) {
+      console.error("Error fetching wallet details:", error);
+    }
+  };
+
+  useEffect(() => {
+    console.log(update ,balance,"==========================");
+    if(update || balance === false){
+     
+      
+      fetchWalletDetails();
+    }
+   // Fetch wallet details when the component mounts
+  }, [update]);
 
   const handleGamePopUp = (data) => {
-    const userid = sessionStorage.getItem("userId") || null;
+    // Check if userId is null or undefined
+    if (!userid) {
+      alert("Error: User not logged in. Please log in to proceed.");
+      return; // Stop the function execution
+    }
+  
     const amount = data;
     const color = selectedColor; // Ensure this variable is defined and has a value
     let number = [];
@@ -140,6 +179,7 @@ const [periods, setPeriods] = useState({
   
     console.log("Payload:====================", payload);
   
+    // Call PREDICT_COLOR API
     axios
       .post(PREDICT_COLOR, payload, {
         headers: {
@@ -148,12 +188,42 @@ const [periods, setPeriods] = useState({
       })
       .then((response) => {
         console.log("API response:", response.data);
-      })
+        // After successful prediction, update wallet balance
+              // Deduct the amount from the current balance
+              const newBalance = balance-parseInt(amount, 10);
+              console.log("New Balance after deduction:", newBalance);
+  
+              // Prepare payload for wallet update  
+              const updatePayload = {
+                userId: userid,
+                cryptoname: "CP",
+                balance: newBalance.toString(),
+              };
+  
+              console.log(updatePayload, "=====================");
+              // Call SET_WALLET_DETAILS API to update the balance
+              axios
+                .put(SET_WALLET_DETAILS, updatePayload, {
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                })
+                .then((updateResponse) => {
+                  setUpdate(true)
+                  window.location.reload();
+                  console.log("Wallet updated successfully:", updateResponse.data);
+              
+                })
+                .catch((updateError) => {
+                  console.error("Error updating wallet:", updateError);
+                });
+
+          })
+      
       .catch((error) => {
         console.error("Error calling PREDICT_COLOR API:", error);
       });
   };
-  
   
   // Disable buttons and change color for the 1min table only after 30 seconds
   useEffect(() => {
@@ -179,7 +249,7 @@ const [periods, setPeriods] = useState({
       setIsDisabled((prev) => ({ ...prev, "5min": false })); // Re-enable 3min buttons
     }
   }, [timeLeft["5min"]]);
-  // Timer logic for 3min table
+  // Timer logic for 3min table 
   useEffect(() => {
     if (timeLeft["10min"] === 10) {
       setIsDisabled((prev) => ({ ...prev, "10min": true })); // Disable 10min buttons
@@ -563,7 +633,7 @@ useEffect(() => {
       </div>
      {/* Game Popup Component */}
      {modalOpen && (
-        <GamePopup modalOpen={modalOpen} toggleModal={toggleModal} title={selectedTitle} color={selectedColor} sendData={handleGamePopUp} />
+        <GamePopup modalOpen={modalOpen} toggleModal={toggleModal} title={selectedTitle} color={selectedColor} sendData={handleGamePopUp} balance = {balance} setBalance ={setBalance} />
       )}
     </div>
   );

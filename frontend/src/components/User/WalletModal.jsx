@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { WALLET_DEPOSITE, WALLET_WITHDRAW } from '../../constants/apiEndpoints';
+import { WALLET_DEPOSITE, WALLET_WITHDRAW,USER_WALLET_DETAILS } from '../../constants/apiEndpoints';
 import { useNavigate, Link } from 'react-router-dom';
 
 const WalletModal = ({ visibleFundingWallet, toggleModal }) => {
@@ -25,7 +25,7 @@ const WalletModal = ({ visibleFundingWallet, toggleModal }) => {
     try {
       if (action === 'withdrawal') {
         // Fetch wallet details
-        const walletDetails = await axios.get(`http://localhost:5000/api/user/wallet/${userId}`);
+        const walletDetails = await axios.get(USER_WALLET_DETAILS(userId));
         const wallet = walletDetails.data.find((w) => w.cryptoname === cryptoname);
 
         if (!wallet) {

@@ -3,8 +3,9 @@ import { Link,useLocation, useNavigate } from "react-router-dom";
 import { FaCog } from "react-icons/fa";
 import WalletModal from "./User/WalletModal";
 import axios from "axios";
+import {USER_WALLET_DETAILS } from '../constants/apiEndpoints';
 
-const Header = () => {
+const Header = () => {  
   const navigate = useNavigate();
   const userToken = sessionStorage.getItem("usertoken");
   const userId = sessionStorage.getItem("userId");
@@ -27,7 +28,7 @@ const Header = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/user/wallet/${userId}`);
+        const response =  await axios.get(USER_WALLET_DETAILS(userId));
         setWallet(response.data);
       } catch (error) {
         console.error("Error fetching wallet data:", error);
