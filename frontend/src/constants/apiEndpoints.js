@@ -55,3 +55,6 @@ export const DELETE_BANK_ACCOUNT = (id) => `${BASE_URL}/api/bankaccount/delete/$
   export const USER_WALLET_DETAILS =   (id) => `${BASE_URL}/api/user/wallet/${id}`;
   export const UPDATE_WALLET_DETAILS = `${BASE_URL}/api/user/wallet/balance`;
   export const SET_WALLET_DETAILS = `${BASE_URL}/api/user/wallet/balance/set`;
+  //result
+  export const COLOR_RESULT = `${BASE_URL}/api/color/result`;
+  export const Get_RESULT =  (id) => `${BASE_URL}/api/color/result/${id}`;
