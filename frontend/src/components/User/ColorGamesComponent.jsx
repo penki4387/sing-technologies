@@ -54,45 +54,61 @@ const generateNewPeriod = (tableName) => {
   const [activeTable, setActiveTable] = useState("1min");
   const [currentPage, setCurrentPage] = useState(1); // Current page for pagination
   const [saturation, setSaturation] = useState(1); // Variable for table saturation effect
+  const [tableResults, setTableResults] = useState([]);
+  const [results1min, setResults1min] = useState([]);
+const [results3min, setResults3min] = useState([]);
+const [results5min, setResults5min] = useState([]);
+const [results10min, setResults10min] = useState([]);
+
+    // Function to fetch results based on the active table
+    const fetchTableResults = async (tableName) => {
+      try {
+    
+        // Ensure Get_RESULT is correctly called with the tableName
+        const url = Get_RESULT(tableName);  // This will create the full URL with the tableName
+    
+        const response = await axios.get(url, {
+          params: {
+            mins: tableName, // Send the table name as a parameter if needed by the API
+          },
+        });
+    
+        // Update the correct state based on the table name
+        if (tableName === "1min") {
+          setResults1min(response.data);
+        } else if (tableName === "3min") {
+          setResults3min(response.data);
+        } else if (tableName === "5min") {
+          setResults5min(response.data);
+        } else if (tableName === "10min") {
+          setResults10min(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching table results:", error);
+      }
+    };
+    
+    
+
+
+     // Fetch results whenever the active table changes
+  useEffect(() => {
+    fetchTableResults(activeTable);
+  }, [activeTable]);
 
   const tableData = {
-    "1min": Array.from({ length: 20 }, (_, i) => ({
-      period: `202501037${38 - i}`,
-      price: `${37000 + i * 10}`,
-      number: i % 10,
-      result: i % 2 === 0 ? "green" : "red",
-    })),
-    "3min": Array.from({ length: 20 }, (_, i) => ({
-      period: `202501037${18 - i}`,
-      price: `${38000 + i * 15}`,
-      number: (i + 1) % 10,
-      result: (i + 1) % 2 === 0 ? "green" : "red",
-    })),
-    "5min": Array.from({ length: 20 }, (_, i) => ({
-      period: `202501037${58 - i}`,
-      price: `${39000 + i * 20}`,
-      number: (i + 2) % 10,
-      result: (i + 2) % 2 === 0 ? "green" : "red",
-    })),
-    "10min": Array.from({ length: 20 }, (_, i) => ({
-      period: `202501037${78 - i}`,
-      price: `${40000 + i * 25}`,
-      number: (i + 3) % 10,
-      result: (i + 3) % 2 === 0 ? "green" : "red",
-    })),
+   "1min": results1min,
+  "3min": results3min,
+  "5min": results5min,
+  "10min": results10min,
   };
+
+
   const recordsPerPage = 10;
   const totalPages = Math.ceil(tableData[activeTable].length / recordsPerPage);
 
 
-  const openPopup = (title, color) => {
-    setSelectedTitle(title);
-    setSelectedColor(color);
-    setModalOpen(true);
-  };
- const toggleModal = () => {
-    setModalOpen(false);
-  };
+
   const handlePageChange = (pageNumber) => {
     if (pageNumber >= 1 && pageNumber <= totalPages) {
       setCurrentPage(pageNumber);
@@ -117,34 +133,14 @@ const generateNewPeriod = (tableName) => {
   );
 
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setTimeLeft((prevTimeLeft) => {
-  //       const newTimeLeft = { ...prevTimeLeft };
-  //       const currentTime = Date.now();
-
-  //       Object.keys(newTimeLeft).forEach((key) => {
-  //         const lastSavedTime = sessionStorage.getItem(`lastSavedTime-${key}`);
-  //         if (lastSavedTime) {
-  //           const elapsed = Math.floor((currentTime - parseInt(lastSavedTime, 10)) / 1000);
-  //           newTimeLeft[key] = Math.max(newTimeLeft[key] - elapsed, 0);
-  //           if (newTimeLeft[key] === 0) {
-  //             newTimeLeft[key] = { "1min": 60, "3min": 180, "5min": 300, "10min": 600 }[key];
-  //             setPeriods((prevPeriods) => ({ ...prevPeriods, [key]: generateNewPeriod(key) }));
-  //             console.log("+++++++++++++++++++++++++++++++++");
-  //           }
-  //         }
-  //         sessionStorage.setItem(`lastSavedTime-${key}`, currentTime.toString());
-  //       });
-
-  //       sessionStorage.setItem("timeLeft", JSON.stringify(newTimeLeft));
-  //       sessionStorage.setItem("periods", JSON.stringify(periods));
-  //       return newTimeLeft;
-  //     });
-  //   }, 1000);
-
-  //   return () => clearInterval(interval);
-  // }, [periods]);
+  const openPopup = (title, color) => {
+    setSelectedTitle(title);
+    setSelectedColor(color);
+    setModalOpen(true);
+  };
+ const toggleModal = () => {
+    setModalOpen(false);
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -171,8 +167,11 @@ const generateNewPeriod = (tableName) => {
               const apiCalled = sessionStorage.getItem(apiCalledKey);
   
               if (!apiCalled && previousPeriod) {
-                // Call the COLOR_RESULT API with the previous period
+                // Call the COLOR_RESULT API with the previous period first
                 ColorResultAPI(previousPeriod, key);
+  
+                // After calling ColorResultAPI, call fetchTableResults
+                fetchTableResults(key); // Call fetchTableResults after ColorResultAPI
   
                 // Mark API as called for this cycle
                 sessionStorage.setItem(apiCalledKey, "true");
@@ -629,84 +628,40 @@ const fetchWalletDetails = async () => {
         </div>
       </div>
   
-      {/* Table */}
       <div className="w-full max-w-5xl">
-        <h2 className="text-lg font-bold mb-2 flex justify-center items-center gap-2">
-          <span className="text-green-500 text-xl">🏆</span>
-          {activeTable} Record
-        </h2>
-        <table className="table-auto w-full border border-gray-700 mb-4">
-          <thead>
-            <tr className="bg-gray-700">
-              <th className="px-4 py-2">Period</th>
-              <th className="px-4 py-2">Price</th>
-              <th className="px-4 py-2">Number</th>
-              <th className="px-4 py-2">Result</th>
-              <th className="px-4 py-2">Small & Big</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentRecords.map((row, index) => (
-              <tr key={index} className="text-center">
-                <td className="px-4 py-2">{row.period}</td>
-                <td className="px-4 py-2">{row.price}</td>
-                <td className="px-4 py-2">{row.number}</td>
-                <td className="px-4 py-2">
-                  {row.number === 0 ? (
-                    <>
-                      <span
-                        style={{
-                          display: "inline-block",
-                          width: "20px",
-                          height: "20px",
-                          borderRadius: "50%",
-                          backgroundColor: "#8b5cf6",
-                        }}
-                      ></span>
-                      <span> + </span>
-                      <span
-                        style={{
-                          display: "inline-block",
-                          width: "20px",
-                          height: "20px",
-                          borderRadius: "50%",
-                          backgroundColor: "#EF4444",
-                        }}
-                      ></span>
-                    </>
-                  ) : row.number === 5 ? (
-                    <>
-                      <span
-                        style={{
-                          display: "inline-block",
-                          width: "20px",
-                          height: "20px",
-                          borderRadius: "50%",
-                          backgroundColor: "#8b5cf6",
-                        }}
-                      ></span>
-                      <span> + </span>
-                      <span
-                        style={{
-                          display: "inline-block",
-                          width: "20px",
-                          height: "20px",
-                          borderRadius: "50%",
-                          backgroundColor: "#10B981",
-                        }}
-                      ></span>
-                    </>
-                  ) : row.result === "green" ? (
+      <h2 className="text-lg font-bold mb-2 flex justify-center items-center gap-2">
+        <span className="text-green-500 text-xl">🏆</span>
+        {activeTable} Record
+      </h2>
+      <table className="table-auto w-full border border-gray-700 mb-4">
+        <thead>
+          <tr className="bg-gray-700">
+            <th className="px-4 py-2">Period</th>
+            <th className="px-4 py-2">Price</th>
+            <th className="px-4 py-2">Number</th>
+            <th className="px-4 py-2">Result</th>
+            <th className="px-4 py-2">Small & Big</th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentRecords.map((row, index) => (
+            <tr key={index} className="text-center">
+              <td className="px-4 py-2">{row.period}</td>
+              <td className="px-4 py-2">{row.price}</td>
+              <td className="px-4 py-2">{row.number}</td>
+              <td className="px-4 py-2">
+                {row.number === "0" ? (
+                  <>
                     <span
                       style={{
                         display: "inline-block",
                         width: "20px",
                         height: "20px",
                         borderRadius: "50%",
-                        backgroundColor: "#10B981",
+                        backgroundColor: "#8b5cf6",
                       }}
                     ></span>
-                  ) : (
+                    <span> + </span>
                     <span
                       style={{
                         display: "inline-block",
@@ -716,49 +671,92 @@ const fetchWalletDetails = async () => {
                         backgroundColor: "#EF4444",
                       }}
                     ></span>
-                  )}
-                </td>
-                <td className="px-4 py-2">
-                  {row.number % 2 === 0 ? "Small" : "Big"}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-  
-        {/* Pagination */}
-        <div className="flex justify-center items-center gap-4">
-          <button
-            className="px-4 py-2 bg-gray-700 text-white rounded"
-            onClick={handlePrevPage}
-            disabled={currentPage === 1}
-          >
-            <FaChevronLeft />
-          </button>
-  
-          {[...Array(totalPages)].map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => handlePageChange(idx + 1)}
-              className={`px-4 py-2 rounded ${
-                currentPage === idx + 1
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-700 text-white"
-              }`}
-            >
-              {idx + 1}
-            </button>
+                  </>
+                ) : row.number === "5" ? (
+                  <>
+                    <span
+                      style={{
+                        display: "inline-block",
+                        width: "20px",
+                        height: "20px",
+                        borderRadius: "50%",
+                        backgroundColor: "#8b5cf6",
+                      }}
+                    ></span>
+                    <span> + </span>
+                    <span
+                      style={{
+                        display: "inline-block",
+                        width: "20px",
+                        height: "20px",
+                        borderRadius: "50%",
+                        backgroundColor: "#10B981",
+                      }}
+                    ></span>
+                  </>
+                ) : row.result === "green" ? (
+                  <span
+                    style={{
+                      display: "inline-block",
+                      width: "20px",
+                      height: "20px",
+                      borderRadius: "50%",
+                      backgroundColor: "#10B981",
+                    }}
+                  ></span>
+                ) : (
+                  <span
+                    style={{
+                      display: "inline-block",
+                      width: "20px",
+                      height: "20px",
+                      borderRadius: "50%",
+                      backgroundColor: "#EF4444",
+                    }}
+                  ></span>
+                )}
+              </td>
+              <td className="px-4 py-2">
+                {row.number % 2 === 0 ? "Small" : "Big"}
+              </td>
+            </tr>
           ))}
-  
+        </tbody>
+      </table>
+
+      {/* Pagination */}
+      <div className="flex justify-center items-center gap-4">
+        <button
+          className="px-4 py-2 bg-gray-700 text-white rounded"
+          onClick={handlePrevPage}
+          disabled={currentPage === 1}
+        >
+          <FaChevronLeft />
+        </button>
+
+        {[...Array(totalPages)].map((_, idx) => (
           <button
-            className="px-4 py-2 bg-gray-700 text-white rounded"
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages}
+            key={idx}
+            onClick={() => handlePageChange(idx + 1)}
+            className={`px-4 py-2 rounded ${
+              currentPage === idx + 1
+                ? "bg-blue-600 text-white"
+                : "bg-gray-700 text-white"
+            }`}
           >
-            <FaChevronRight />
+            {idx + 1}
           </button>
-        </div>
+        ))}
+
+        <button
+          className="px-4 py-2 bg-gray-700 text-white rounded"
+          onClick={handleNextPage}
+          disabled={currentPage === totalPages}
+        >
+          <FaChevronRight />
+        </button>
       </div>
+    </div>
      {/* Game Popup Component */}
      {modalOpen && (
         <GamePopup modalOpen={modalOpen} toggleModal={toggleModal} title={selectedTitle} color={selectedColor} sendData={handleGamePopUp} balance = {balance} setBalance ={setBalance} />

@@ -109,7 +109,6 @@ router.get("/result/:name",async(req,res)=>{
     const query = "SELECT * FROM results WHERE mins = ? ";
     connection.query(query,[Tablename],(err,result)=>{
       if (err) return res.status(500).json({ error: 'Database query error' });
-      if (result.length === 0) return res.status(404).json({ error: 'no data found' });
       res.json(result);
     })
   } catch (error) {
