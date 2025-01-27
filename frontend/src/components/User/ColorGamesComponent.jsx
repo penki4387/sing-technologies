@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import GamePopup from "./PopUpComponent"; // Import the popup
-import { PREDICT_COLOR,SET_WALLET_DETAILS,USER_WALLET_DETAILS,COLOR_RESULT } from "../../constants/apiEndpoints"; // Assuming this is defined
+import { PREDICT_COLOR,SET_WALLET_DETAILS,USER_WALLET_DETAILS,COLOR_RESULT ,Get_RESULT} from "../../constants/apiEndpoints"; // Assuming this is defined
 import axios from 'axios'; 
 
 
@@ -146,57 +146,61 @@ const generateNewPeriod = (tableName) => {
   //   return () => clearInterval(interval);
   // }, [periods]);
 
-useEffect(() => {
-  const interval = setInterval(() => {
-    setTimeLeft((prevTimeLeft) => {
-      const newTimeLeft = { ...prevTimeLeft };
-      const currentTime = Date.now();
-
-      Object.keys(newTimeLeft).forEach((key) => {
-        const lastSavedTime = sessionStorage.getItem(`lastSavedTime-${key}`);
-        if (lastSavedTime) {
-          const elapsed = Math.floor((currentTime - parseInt(lastSavedTime, 10)) / 1000);
-          newTimeLeft[key] = Math.max(newTimeLeft[key] - elapsed, 0);
-
-          // If the timer reaches 0, reset it, generate a new period, and call the API
-          if (newTimeLeft[key] === 0) {
-            // Reset timer
-            newTimeLeft[key] = { "1min": 60, "3min": 180, "5min": 300, "10min": 600 }[key];
-
-            // Check if the API for this key has already been called
-            const apiCalledKey = `apiCalled-${key}`;
-            const apiCalled = sessionStorage.getItem(apiCalledKey);
-
-            if (!apiCalled) {
-              // Generate a new period
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeLeft((prevTimeLeft) => {
+        const newTimeLeft = { ...prevTimeLeft };
+        const currentTime = Date.now();
+  
+        Object.keys(newTimeLeft).forEach((key) => {
+          const lastSavedTime = sessionStorage.getItem(`lastSavedTime-${key}`);
+          if (lastSavedTime) {
+            const elapsed = Math.floor((currentTime - parseInt(lastSavedTime, 10)) / 1000);
+            newTimeLeft[key] = Math.max(newTimeLeft[key] - elapsed, 0);
+  
+            // If the timer reaches 0, reset it and call the API with the previous period
+            if (newTimeLeft[key] === 0) {
+              // Reset timer
+              newTimeLeft[key] = { "1min": 60, "3min": 180, "5min": 300, "10min": 600 }[key];
+  
+              // Retrieve the previously saved period for this key
+              const previousPeriod = sessionStorage.getItem(`period-${key}`);
+  
+              // Check if the API for this key has already been called
+              const apiCalledKey = `apiCalled-${key}`;
+              const apiCalled = sessionStorage.getItem(apiCalledKey);
+  
+              if (!apiCalled && previousPeriod) {
+                // Call the COLOR_RESULT API with the previous period
+                ColorResultAPI(previousPeriod, key);
+  
+                // Mark API as called for this cycle
+                sessionStorage.setItem(apiCalledKey, "true");
+  
+                // Reset API call flag after a new timer cycle starts
+                setTimeout(() => {
+                  sessionStorage.removeItem(apiCalledKey);
+                }, newTimeLeft[key] * 1000);
+              }
+  
+              // Generate a new period for the next cycle and save it
               const newPeriod = generateNewPeriod(key);
+              sessionStorage.setItem(`period-${key}`, newPeriod);
               setPeriods((prevPeriods) => ({ ...prevPeriods, [key]: newPeriod }));
-
-              // Call the COLOR_RESULT API
-              ColorResultAPI(newPeriod, key);
-
-              // Mark API as called for this cycle
-              sessionStorage.setItem(apiCalledKey, "true");
-
-              // Reset API call flag after a new timer cycle starts
-              setTimeout(() => {
-                sessionStorage.removeItem(apiCalledKey);
-              }, newTimeLeft[key] * 1000);
             }
           }
-        }
-        // Update session storage for the current time
-        sessionStorage.setItem(`lastSavedTime-${key}`, currentTime.toString());
+          // Update session storage for the current time
+          sessionStorage.setItem(`lastSavedTime-${key}`, currentTime.toString());
+        });
+  
+        // Update session storage for timeLeft
+        sessionStorage.setItem("timeLeft", JSON.stringify(newTimeLeft));
+        return newTimeLeft;
       });
-
-      // Update session storage for timeLeft
-      sessionStorage.setItem("timeLeft", JSON.stringify(newTimeLeft));
-      return newTimeLeft;
-    });
-  }, 1000);
-
-  return () => clearInterval(interval);
-}, [periods]);
+    }, 1000);
+  
+    return () => clearInterval(interval);
+  }, [periods]);
   
   useEffect(() => {
     Object.keys(timeLeft).forEach((key) => {
