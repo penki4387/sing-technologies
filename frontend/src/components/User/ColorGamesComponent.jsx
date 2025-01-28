@@ -19,7 +19,7 @@ const ColorGamesComponent = () => {
         };
   });
   // Function to generate a new period with random last 4 digits
-const generateNewPeriod = (tableName) => {
+const generateNewPeriod = () => {
   const currentDate = new Date();
   const year = currentDate.getFullYear();
   const month = (currentDate.getMonth() + 1).toString().padStart(2, "0");
@@ -27,17 +27,36 @@ const generateNewPeriod = (tableName) => {
   const randomLast4 = Math.floor(1000 + Math.random() * 9000); // Ensure 4-digit random number
   return `${year}${month}${day}${randomLast4}`;
 };
-  const [periods, setPeriods] = useState(() => {
-    const savedPeriods = sessionStorage.getItem("periods");
-    return savedPeriods
-      ? JSON.parse(savedPeriods)
-      : {
-          "1min": generateNewPeriod("1min"),
-          "3min": generateNewPeriod("3min"),
-          "5min": generateNewPeriod("5min"),
-          "10min": generateNewPeriod("10min"),
-        };
+const [periods, setPeriods] = useState(() => {
+  // Load periods from sessionStorage or generate new ones
+  const savedPeriods = {
+    "1min": sessionStorage.getItem("period-1min") || generateNewPeriod("1min"),
+    "3min": sessionStorage.getItem("period-3min") || generateNewPeriod("3min"),
+    "5min": sessionStorage.getItem("period-5min") || generateNewPeriod("5min"),
+    "10min": sessionStorage.getItem("period-10min") || generateNewPeriod("10min"),
+  };
+
+  // Save the initial values to sessionStorage (if not already present)
+  Object.entries(savedPeriods).forEach(([key, value]) => {
+    if (!sessionStorage.getItem(`period-${key}`)) {
+      sessionStorage.setItem(`period-${key}`, value);
+    }
   });
+
+  return savedPeriods;
+});
+
+  // const [periods, setPeriods] = useState(() => {
+  //   const savedPeriods = sessionStorage.getItem("periods");
+  //   return savedPeriods
+  //     ? JSON.parse(savedPeriods)
+  //     : {
+  //         "1min": generateNewPeriod(),
+  //         "3min": generateNewPeriod(),
+  //         "5min": generateNewPeriod(),
+  //         "10min": generateNewPeriod(),
+  //       };
+  // });
   const [isDisabled, setIsDisabled] = useState({
     "1min": false,
     "3min": false,
@@ -142,64 +161,186 @@ const [results10min, setResults10min] = useState([]);
     setModalOpen(false);
   };
 
+
+ 
   useEffect(() => {
     const interval = setInterval(() => {
       setTimeLeft((prevTimeLeft) => {
         const newTimeLeft = { ...prevTimeLeft };
         const currentTime = Date.now();
   
+        // Iterate over all tables (1min, 3min, 5min, 10min)
         Object.keys(newTimeLeft).forEach((key) => {
           const lastSavedTime = sessionStorage.getItem(`lastSavedTime-${key}`);
+          const apiCalledKey = `apiCalled-${key}`;
+  
           if (lastSavedTime) {
+            // Calculate elapsed time
             const elapsed = Math.floor((currentTime - parseInt(lastSavedTime, 10)) / 1000);
             newTimeLeft[key] = Math.max(newTimeLeft[key] - elapsed, 0);
   
-            // If the timer reaches 0, reset it and call the API with the previous period
-            if (newTimeLeft[key] === 0) {
-              // Reset timer
-              newTimeLeft[key] = { "1min": 60, "3min": 180, "5min": 300, "10min": 600 }[key];
-  
-              // Retrieve the previously saved period for this key
+            // If the timer reaches 0 for the current table, reset and perform operations
+            if (newTimeLeft[key] === 0 && !sessionStorage.getItem(apiCalledKey)) {
               const previousPeriod = sessionStorage.getItem(`period-${key}`);
   
-              // Check if the API for this key has already been called
-              const apiCalledKey = `apiCalled-${key}`;
-              const apiCalled = sessionStorage.getItem(apiCalledKey);
+              // Call APIs (ensured to only call once per cycle)
+              ColorResultAPI(previousPeriod, key); 
+              fetchTableResults(key); 
   
-              if (!apiCalled && previousPeriod) {
-                // Call the COLOR_RESULT API with the previous period first
-                ColorResultAPI(previousPeriod, key);
+              // Mark API as called for this cycle
+              sessionStorage.setItem(apiCalledKey, "true");
   
-                // After calling ColorResultAPI, call fetchTableResults
-                fetchTableResults(key); // Call fetchTableResults after ColorResultAPI
-  
-                // Mark API as called for this cycle
-                sessionStorage.setItem(apiCalledKey, "true");
-  
-                // Reset API call flag after a new timer cycle starts
-                setTimeout(() => {
-                  sessionStorage.removeItem(apiCalledKey);
-                }, newTimeLeft[key] * 1000);
-              }
-  
-              // Generate a new period for the next cycle and save it
+              // Reset timer and generate new period
+              newTimeLeft[key] = { "1min": 60, "3min": 180, "5min": 300, "10min": 600 }[key];
               const newPeriod = generateNewPeriod(key);
               sessionStorage.setItem(`period-${key}`, newPeriod);
               setPeriods((prevPeriods) => ({ ...prevPeriods, [key]: newPeriod }));
+  
+              // Reset API call flag for the next cycle
+              setTimeout(() => {
+                sessionStorage.removeItem(apiCalledKey); // Reset the flag for the next cycle
+              }, 1000); // Reset flag after 1 second
             }
+          } else {
+            // Initialize timer if no lastSavedTime is found
+            newTimeLeft[key] = { "1min": 60, "3min": 180, "5min": 300, "10min": 600 }[key];
+            sessionStorage.setItem(`lastSavedTime-${key}`, currentTime.toString());
           }
+  
           // Update session storage for the current time
           sessionStorage.setItem(`lastSavedTime-${key}`, currentTime.toString());
         });
   
-        // Update session storage for timeLeft
+        // Save the updated timeLeft to sessionStorage
         sessionStorage.setItem("timeLeft", JSON.stringify(newTimeLeft));
+  
         return newTimeLeft;
       });
     }, 1000);
   
-    return () => clearInterval(interval);
-  }, [periods]);
+    return () => clearInterval(interval); // Cleanup interval
+  }, []);
+  
+  
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setTimeLeft((prevTimeLeft) => {
+  //       const newTimeLeft = { ...prevTimeLeft };
+  //       const currentTime = Date.now();
+  
+  //       // Iterate over all tables (1min, 3min, 5min, 10min)
+  //       Object.keys(newTimeLeft).forEach((key) => {
+  //         const lastSavedTime = sessionStorage.getItem(`lastSavedTime-${key}`);
+  //         const apiCalledKey = `apiCalled-${key}`;
+  
+  //         if (lastSavedTime) {
+  //           // Calculate elapsed time
+  //           const elapsed = Math.floor((currentTime - parseInt(lastSavedTime, 10)) / 1000);
+  //           newTimeLeft[key] = Math.max(newTimeLeft[key] - elapsed, 0);
+  
+  //           // If the timer reaches 0 for the current table, reset and perform operations
+  //           if (newTimeLeft[key] === 0) {
+  //             newTimeLeft[key] = { "1min": 60, "3min": 180, "5min": 300, "10min": 600 }[key]; // Reset timer
+  
+  //             // Check if API has already been called for this cycle
+  //             const apiCalled = sessionStorage.getItem(apiCalledKey);
+  
+           
+  //               const previousPeriod = sessionStorage.getItem(`period-${key}`);
+  
+  //               // Call APIs only once per cycle
+  //               ColorResultAPI(previousPeriod, key);
+  //               fetchTableResults(key);
+  
+  //               // Mark API as called
+  //               sessionStorage.setItem(apiCalledKey, "true");
+  
+  //               // Generate a new period for the next cycle
+  //               const newPeriod = generateNewPeriod(key);
+  //               sessionStorage.setItem(`period-${key}`, newPeriod);
+  //               setPeriods((prevPeriods) => ({ ...prevPeriods, [key]: newPeriod })); // Update state
+              
+  
+  //             // Ensure the API call flag resets only after the timer completes the next cycle
+  //             // setTimeout(() => {
+  //             //   sessionStorage.setItem(apiCalledKey, "false");
+  //             // }, newTimeLeft[key] * 1000);
+  //           }
+  //         }
+  
+  //         // Update session storage for the current time for each table
+  //         sessionStorage.setItem(`lastSavedTime-${key}`, currentTime.toString());
+  //       });
+  
+  //       // Save the updated timeLeft to sessionStorage
+  //       sessionStorage.setItem("timeLeft", JSON.stringify(newTimeLeft));
+  
+  //       return newTimeLeft;
+  //     });
+  //   }, 1000);
+  
+  //   return () => clearInterval(interval); // Cleanup interval
+  // }, []);
+  
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setTimeLeft((prevTimeLeft) => {
+  //       const newTimeLeft = { ...prevTimeLeft };
+  //       const currentTime = Date.now();
+  
+  //       Object.keys(newTimeLeft).forEach((key) => {
+  //         const lastSavedTime = sessionStorage.getItem(`lastSavedTime-${key}`);
+  //         if (lastSavedTime) {
+  //           const elapsed = Math.floor((currentTime - parseInt(lastSavedTime, 10)) / 1000);
+  //           newTimeLeft[key] = Math.max(newTimeLeft[key] - elapsed, 0);
+  
+  //           // If the timer reaches 0, reset it and call the API with the previous period
+  //           if (newTimeLeft[key] === 0) {
+  //             // Reset timer
+  //             newTimeLeft[key] = { "1min": 60, "3min": 180, "5min": 300, "10min": 600 }[key];
+  
+  //             // Retrieve the previously saved period for this key
+  //             const previousPeriod = sessionStorage.getItem(`period-${key}`);
+  
+  //             // Check if the API for this key has already been called
+  //             const apiCalledKey = `apiCalled-${key}`;
+  //             const apiCalled = sessionStorage.getItem(apiCalledKey);
+  
+  //             if (!apiCalled && previousPeriod) {
+  //               // Call the COLOR_RESULT API with the previous period
+  //               ColorResultAPI(previousPeriod, key);
+  
+  //               // Call fetchTableResults after ColorResultAPI
+  //               fetchTableResults(key);
+  
+  //               // Mark API as called for this cycle
+  //               sessionStorage.setItem(apiCalledKey, "true");
+  
+  //               // Reset API call flag after a new timer cycle starts
+  //               setTimeout(() => {
+  //                 sessionStorage.removeItem(apiCalledKey);
+  //               }, newTimeLeft[key] * 1000);
+  //             }
+  
+  //             // Generate a new period for the next cycle and save it
+  //             const newPeriod = generateNewPeriod(key);
+  //             sessionStorage.setItem(`period-${key}`, newPeriod);
+  //             setPeriods((prevPeriods) => ({ ...prevPeriods, [key]: newPeriod }));
+  //           }
+  //         }
+  
+  //         // Update session storage for the current time
+  //         sessionStorage.setItem(`lastSavedTime-${key}`, currentTime.toString());
+  //       });
+  
+  //       // Update session storage for timeLeft
+  //       sessionStorage.setItem("timeLeft", JSON.stringify(newTimeLeft));
+  //       return newTimeLeft;
+  //     });
+  //   }, 1000);
+  
+  //   return () => clearInterval(interval);
+  // }, [periods]);
   
   useEffect(() => {
     Object.keys(timeLeft).forEach((key) => {
@@ -217,6 +358,7 @@ const [results10min, setResults10min] = useState([]);
       const payload = {
         period: period,
         mins: mins,
+        userid:userid
       };
   
       const response = await axios.post(COLOR_RESULT, payload);
@@ -365,6 +507,7 @@ const fetchWalletDetails = async () => {
       .toString()
       .padStart(2, "0")}`;
   };
+  // predict colour
     const handleGamePopUp = (data) => {
     // Check if userId is null or undefined
     if (!userid) {
@@ -637,7 +780,6 @@ const fetchWalletDetails = async () => {
         <thead>
           <tr className="bg-gray-700">
             <th className="px-4 py-2">Period</th>
-            <th className="px-4 py-2">Price</th>
             <th className="px-4 py-2">Number</th>
             <th className="px-4 py-2">Result</th>
             <th className="px-4 py-2">Small & Big</th>
@@ -647,7 +789,6 @@ const fetchWalletDetails = async () => {
           {currentRecords.map((row, index) => (
             <tr key={index} className="text-center">
               <td className="px-4 py-2">{row.period}</td>
-              <td className="px-4 py-2">{row.price}</td>
               <td className="px-4 py-2">{row.number}</td>
               <td className="px-4 py-2">
                 {row.number === "0" ? (
@@ -694,7 +835,7 @@ const fetchWalletDetails = async () => {
                       }}
                     ></span>
                   </>
-                ) : row.result === "green" ? (
+                ) : row.color === "green" ? (
                   <span
                     style={{
                       display: "inline-block",

@@ -49,7 +49,7 @@ export const DELETE_BANK_ACCOUNT = (id) => `${BASE_URL}/api/bankaccount/delete/$
 
 // color prediction
  export const PREDICT_COLOR = `${BASE_URL}/api/color/prediction`;
- export const USER_HISTORY = (id) => `${BASE_URL}/api/color/prediction/${id}`;
+ export const USER_HISTORY = (id) => `${BASE_URL}/api/color/prediction/${id}/history`;
 
  //wallet 
   export const USER_WALLET_DETAILS =   (id) => `${BASE_URL}/api/user/wallet/${id}`;

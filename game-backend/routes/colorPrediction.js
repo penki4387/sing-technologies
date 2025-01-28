@@ -41,15 +41,39 @@ router.post("/prediction", async (req, res) => {
   }
 });
 
-router.get("/prediction/:userid", async (req, res) => {
+router.get("/prediction/:userid/history", async (req, res) => {
   try {
     const { userid } = req.params;
-    const query = "SELECT * FROM biddings WHERE userid = ? ORDER BY id DESC"; 
+
+    const query = "SELECT * FROM biddings WHERE userid = ? ORDER BY id DESC";
     connection.query(query, [userid], (err, results) => {
       if (err) return res.status(500).json({ error: "Database query error" });
       if (results.length === 0)
         return res.status(404).json({ error: "User not found" });
-      res.json(results);
+
+      // Query to fetch the results for the periods
+      const periodIds = results.map(bid => bid.period);
+      const resultsQuery = "SELECT * FROM results WHERE period IN (?)";
+      connection.query(resultsQuery, [periodIds], (err, resultRecords) => {
+        if (err) return res.status(500).json({ error: "Database query error" });
+
+        // Iterate over the biddings and determine win or lose
+        const historyWithOutcome = results.map(bid => {
+          // Parse the number array from the biddings table
+          const numbersInBid = JSON.parse(bid.number); // Parse the stringified array
+          const result = resultRecords.find(r => r.period === bid.period);
+
+          if (result) {
+            // Check if the result.number exists in the array from biddings
+            const isWin = numbersInBid.includes(Number(result.number));
+            return { ...bid, win_or_lose: isWin ? "won" : "lose" };
+          } else {
+            return { ...bid, win_or_lose: "lose" }; // If no result is found, it's a lose
+          }
+        });
+
+        res.json(historyWithOutcome);
+      });
     });
   } catch (error) {
     res.status(500).json({ error: "Error fetching user history" });
@@ -58,7 +82,7 @@ router.get("/prediction/:userid", async (req, res) => {
 
 
 
-//result
+// Result route
 router.post("/result", async (req, res) => {
   try {
     const { period, mins } = req.body;
@@ -81,20 +105,50 @@ router.post("/result", async (req, res) => {
       color = "green";
     }
 
-    const query =
-      "INSERT INTO results (number, color, small_big, mins, period) VALUES (?, ?, ?, ?, ?)";
-    connection.query(
-      query,
-      [number, color, small_big, mins, period],
-      (err, results) => {
-        if (err) {
-          console.error(err);
-          return res.status(500).json({ error: "Database error" });
-        }
-        // Respond with a success message
-        res.status(201).json({ message: "Result added successfully", results });
+    // Insert the result into the results table
+    const query = `
+      INSERT INTO results (number, color, small_big, mins, period) 
+      VALUES (?, ?, ?, ?, ?)
+    `;
+    connection.query(query, [number, color, small_big, mins, period], async (err, results) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: "Database error" });
       }
-    );
+
+      // Check if the period and number exist in the biddings table
+      const checkBiddingQuery = `
+        SELECT * 
+        FROM biddings 
+        WHERE period = ? AND JSON_CONTAINS(number, JSON_ARRAY(?))
+      `;
+      connection.query(checkBiddingQuery, [period, number], async (checkErr, checkResults) => {
+        if (checkErr) {
+          console.error(checkErr);
+          return res.status(500).json({ error: "Error checking biddings table" });
+        }
+
+
+        if (checkResults.length > 0) {
+          // Call the WinPrediction function if matching records are found
+          try {
+            const predictionResult = await WinPrediction(period, number);
+            console.log(predictionResult,"==============0000000000000");
+
+            // Respond with a success message
+            return res
+              .status(201)
+              .json({ message: "Result added successfully", results, predictionResult });
+          } catch (predictionError) {
+            console.error(predictionError);
+            return res.status(500).json({ error: "Error processing winners" });
+          }
+        } else {
+          // No matching records found, no need to call WinPrediction
+          return res.status(201).json({ message: "Result added successfully", results });
+        }
+      });
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error adding result" });
@@ -102,11 +156,59 @@ router.post("/result", async (req, res) => {
 });
 
 
+const WinPrediction = async function (period, number) {
+  try {
+    const biddingQuery = `
+      SELECT userid, amount 
+      FROM biddings 
+      WHERE period = ? AND JSON_CONTAINS(number, JSON_ARRAY(?))
+    `;
+    return new Promise((resolve, reject) => {
+      connection.query(biddingQuery, [period, number], (err, results) => {
+        if (err) {
+          console.error(err);
+          return reject(new Error("Database query error in biddings table"));
+        }
+
+        if (results.length === 0) {
+          return resolve("No winners for this period and number");
+        }
+
+        // Process each winner
+        results.forEach((row) => {
+          const { userid, amount } = row;
+
+          // Calculate the total amount to add (amount + 90% of amount)
+          const totalAmount = amount + amount * 0.9;
+
+          // Update the user's wallet balance
+          const walletQuery = `
+            UPDATE wallet 
+            SET balance = balance + ? 
+            WHERE userid = ? AND cryptoname = 'cp'
+          `;
+          connection.query(walletQuery, [totalAmount, userid], (walletErr) => {
+            if (walletErr) {
+              console.error(walletErr);
+              return reject(new Error("Database query error in wallet table"));
+            }
+          });
+        });
+
+        resolve("Winners processed successfully");
+      });
+    });
+  } catch (error) {
+    console.error("Error in WinPrediction function:", error);
+    throw error;
+  }
+};
+
 
 router.get("/result/:name",async(req,res)=>{
   const Tablename = req.params.name
   try {
-    const query = "SELECT * FROM results WHERE mins = ? ";
+    const query = "SELECT * FROM results WHERE mins = ?  ORDER BY id DESC ";
     connection.query(query,[Tablename],(err,result)=>{
       if (err) return res.status(500).json({ error: 'Database query error' });
       res.json(result);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import axios from "axios"; // Import axios
 import { USER_HISTORY } from "../../constants/apiEndpoints"; // Assuming this is defined
@@ -8,11 +8,12 @@ const HIstoryComponent = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [tableData, setTableData] = useState([]); // State to store the fetched data
   const [userId, setUserId] = useState(null);
+  const isFetchedRef = useRef(false);
 
   useEffect(() => {
     const storedUserId = sessionStorage.getItem("userId");
-    if (storedUserId) {
-      setUserId(storedUserId);
+    if (storedUserId && !isFetchedRef.current) {
+      isFetchedRef.current = true; // Mark API call as done
       fetchUserHistory(storedUserId);
     }
   }, []);
@@ -84,6 +85,7 @@ const HIstoryComponent = () => {
               <th className="px-4 py-2">Color</th>
               <th className="px-4 py-2">mins</th>
               <th className="px-4 py-2">Small&Big</th>
+              <th className="px-4 py-2">win_or_lose</th>
             </tr>
           </thead>
           <tbody>
@@ -122,6 +124,7 @@ const HIstoryComponent = () => {
                 </td>
                 <td className="px-4 py-2">{row.mins}</td>
                 <td className="px-4 py-2">{row.small_big}</td>
+                <td className="px-4 py-2">{row.win_or_lose}</td>
               </tr>
             ))}
           </tbody>
