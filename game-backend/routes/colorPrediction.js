@@ -68,7 +68,7 @@ router.get("/prediction/:userid/history", async (req, res) => {
             const isWin = numbersInBid.includes(Number(result.number));
             return { ...bid, win_or_lose: isWin ? "won" : "lose" };
           } else {
-            return { ...bid, win_or_lose: "lose" }; // If no result is found, it's a lose
+            return { ...bid, win_or_lose: "pending" }; // If no result is found, it's a lose
           }
         });
 
@@ -178,8 +178,11 @@ const WinPrediction = async function (period, number) {
         results.forEach((row) => {
           const { userid, amount } = row;
 
-          // Calculate the total amount to add (amount + 90% of amount)
-          const totalAmount = amount + amount * 0.9;
+          // Ensure amount is treated as a number
+          const numericAmount = parseFloat(amount);
+
+          // Correct 90% calculation
+          const totalAmount = numericAmount + numericAmount * 0.9;
 
           // Update the user's wallet balance
           const walletQuery = `
@@ -203,6 +206,7 @@ const WinPrediction = async function (period, number) {
     throw error;
   }
 };
+
 
 
 router.get("/result/:name",async(req,res)=>{
