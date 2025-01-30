@@ -582,7 +582,10 @@ const fetchWalletDetails = async () => {
                 })
                 .then((updateResponse) => {
                   setUpdate(true)
-                  window.location.reload();
+                  window.location.href = "https://rollix777.com";
+                  // setTimeout(() => {
+                  //     window.location.reload();
+                  // }, 1000); // Reload after 1 second
                   console.log("Wallet updated successfully:", updateResponse.data);
               
                 })
@@ -857,9 +860,10 @@ const fetchWalletDetails = async () => {
                   ></span>
                 )}
               </td>
-              <td className="px-4 py-2">
-                {row.number % 2 === 0 ? "Small" : "Big"}
-              </td>
+              <td className="px-4 py-2">{row.small_big}</td>
+              {/* <td className="px-4 py-2">
+                {row.number % 2 === 0 ? "Big": "Small"}
+              </td> */}
             </tr>
           ))}
         </tbody>

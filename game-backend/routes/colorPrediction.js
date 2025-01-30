@@ -49,7 +49,7 @@ router.get("/prediction/:userid/history", async (req, res) => {
     connection.query(query, [userid], (err, results) => {
       if (err) return res.status(500).json({ error: "Database query error" });
       if (results.length === 0)
-        return res.status(404).json({ error: "User not found" });
+        return res.json(results);
 
       // Query to fetch the results for the periods
       const periodIds = results.map(bid => bid.period);
